@@ -1,24 +1,7 @@
 import re
-
-operators = {
-    "not": "¬",
-    "and": "∧",
-    "or": "∨",
-    "xor": "⊕",
-    "implication": "→",
-    "bi-conditional": "↔",
-    "ite": "ITE"
-}
-
-
-class Operator:
-    def __init__(self, children):
-        pass
-
-
-class Variable:
-    def __init__(self, name):
-        pass
+from constants import operators
+from Operator import get_operator
+from Variable import Variable
 
 
 def remove_parenthesis(token):
@@ -98,24 +81,23 @@ def parse(formel):
         index += 1
     tokens.append(remove_parenthesis(current_token))
 
-    return
-
     if len(tokens) == 1:
         return Variable(tokens[0])
     else:
         if seperator == "¬":
-            op = Operator([parse(tokens[-1])])
+            op = get_operator(seperator, [parse(tokens[-1])])
             print(len(tokens))
             for i in range(len(tokens) - 2):
-                op = Operator([op])
+                op = get_operator(seperator, [op])
             return op
         else:
-            return Operator([parse(token) for token in tokens])
+            return get_operator(seperator, [parse(token) for token in tokens])
 
 
 if __name__ == "__main__":
     print("test")
-    formel = "¬a ∧ b ITE c ∧ b"
+    formel = "¬a ∧ b ITE (c ∧ b ITE d)"
 
     root = parse(formel)
+    print(root)
 
