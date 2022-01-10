@@ -7,3 +7,5 @@ operators = {
     "bi-conditional": "↔",
     "ite": "ITE"
 }
+
+prefix_operators = ("ITE", )

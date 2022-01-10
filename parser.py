@@ -1,5 +1,6 @@
 import re
 from constants import operators
+from constants import prefix_operators
 from Operator import get_operator
 from Variable import Variable
 
@@ -38,9 +39,46 @@ def find_operator(formel, index):
         return None
 
 
+def preproc_prefix(formel):
+    index = 0
+    while index < len(formel):
+        char = formel[index]
+        for operator in prefix_operators:
+            if operator.startswith(char) and formel[index:index+len(operator)] == operator:
+                index += len(operator)
+                char = formel[index]
+                if char != "(":
+                    raise SyntaxError
+                indent_level = 1
+                index += 1
+
+                current_token = ""
+
+                while indent_level > 0 and index < len(formel):
+                    char = formel[index]
+                    if char == "(":
+                        indent_level += 1
+                    elif char == ")":
+                        indent_level -= 1
+                    else:
+                        current_token += char
+
+                    index += 1
+
+                print("current_token", (" "+operator+" ").join(current_token.split(",")))
+                if indent_level > 0:
+                    raise SyntaxError
+                break
+        index += 1
+    return formel
+
+
 def parse(formel):
     formel = re.sub(r"\s", "", formel)
     formel = remove_parenthesis(formel)
+
+    formel = preproc_prefix(formel)
+
     index = 0
     indent_level = 0
     min_binding_priority = -1
@@ -95,8 +133,7 @@ def parse(formel):
 
 
 if __name__ == "__main__":
-    print("test")
-    formel = "¬a ∧ b ITE (c ∧ b ITE d)"
+    formel = "ITE(a, b, c)"
 
     root = parse(formel)
-    print(root)
+    print(type(root), root.children)
