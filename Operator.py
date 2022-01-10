@@ -20,22 +20,6 @@ class Operator(Token, ABC):
     def __init__(self, children):
         self.children = children
 
-    def negate(self):
-        if self.operator == operators["not"]:
-            return self.children[0]
-        elif self.operator == operators["and"]:
-            self.operator = operators["or"]
-        elif self.operator == operators["or"]:
-            self.operator = operators["and"]
-        elif self.operator == operators["implication"]:
-            tmp = self.children[0]
-            self.children[0] = self.children[1]
-            self.children[1] = tmp
-
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].negate()
-        return self
-
     def unary_traverse(self, operator):
         return operator + str(self.children[0])
 
@@ -54,7 +38,7 @@ class NotOperator(Operator):
         super().simplify()
 
         if isinstance(self.children[0], NotOperator):
-            return self.children[0].children[0]
+            return self.children[0].children[0].simplify()
         if isinstance(self.children[0], AndOperator):
             return OrOperator(list(map(lambda it: NotOperator([it]), self.children[0].children))).simplify()
         elif isinstance(self.children[0], OrOperator):
