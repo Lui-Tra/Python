@@ -1,5 +1,11 @@
+from NotOperator import NotOperator
 from Token import Token
 from constants import operators
+
+
+def get_operator(operator_name, children):
+    if operator_name == operators["not"]:
+        return NotOperator(children)
 
 
 class Operator(Token):

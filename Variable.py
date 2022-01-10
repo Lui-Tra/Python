@@ -7,14 +7,11 @@ class Variable(Token):
         self.name = name
         self.value = value
 
-    def negate(self):
-        return Operator([self], operators["not"])
+    def simplify(self):
+        return self
 
     def traverse(self):
         print(f"{self.name}", end="")
-
-    def simplify(self):
-        return self
 
     def __eq__(self, other):
         if isinstance(other, Variable):

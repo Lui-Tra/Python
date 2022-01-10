@@ -7,13 +7,9 @@ class Token(ABC):
         self.children = children
 
     @abstractmethod
-    def negate(self):
+    def simplify(self):
         pass
 
     @abstractmethod
     def traverse(self):
-        pass
-
-    @abstractmethod
-    def simplify(self):
         pass

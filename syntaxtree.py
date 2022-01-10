@@ -1,4 +1,4 @@
-from Operator import Operator
+from operator import Operator
 from Variable import Variable
 from constants import operators
 
