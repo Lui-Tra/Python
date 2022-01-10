@@ -1,31 +1,19 @@
-from Operator import Operator
+from Operator import get_operator
 from Variable import Variable
 from constants import operators
 
-root = Operator([
-    Variable("A"),
-    Variable("B"),
-    Variable("B"),
-    Operator([
-        Variable("A"),
-        Variable("B"),
-        Variable("B"),
-        Variable("D"),
-    ], operators["and"]),
-    Variable("C"),
-    Variable("E"),
-    Variable("E"),
-    Variable("C"),
-    Variable("C"),
-    Operator([
-        Operator([
-            Variable("E")
-        ], operators["not"])
-    ], operators["not"])
-], operators["and"])
+root = get_operator(operators["and"], [
+    get_operator(operators["not"], [
+        get_operator(operators["or"], [
+            Variable("D"),
+            Variable("X"),
+        ])
+    ]),
+    Variable("B")
+])
 
 if __name__ == "__main__":
-    root.traverse()
-    root = root.simplify().simplify()
-    print()
-    root.traverse()
+    root.simplify()
+    print(root)
+    #root = root.simplify().simplify()
+    #root.traverse()

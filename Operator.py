@@ -4,15 +4,16 @@ from Token import Token
 from constants import operators
 
 
-operator_registry = {}
-
-
 def get_operator(operator_name, children):
-    return operator_registry[operator_name](children)
-
-
-def register_operator(operator_name, cls):
-    operator_registry[operator_name] = cls
+    return {
+        operators["not"]: NotOperator,
+        operators["and"]: AndOperator,
+        operators["or"]: OrOperator,
+        operators["xor"]: XorOperator,
+        operators["implication"]: ImplicationOperator,
+        operators["bi-conditional"]: BiConditionalOperator,
+        operators["ite"]: ITEOperator,
+    }[operator_name](children)
 
 
 class Operator(Token, ABC):
@@ -36,15 +37,58 @@ class Operator(Token, ABC):
         return self
 
     def unary_traverse(self, operator):
-        return operator + self.children[0].traverse()
+        return operator + str(self.children[0])
 
     def multiple_traverse(self, operator):
-        string = " ("
-
-        return " (" + self.children[0].traverse() + operator + self.children[1].traverse() + ") "
+        return "(" + (" " + operator + " ").join(map(str, self.children)) + ")"
 
     def simplify(self):
         for i in range(len(self.children)):
             self.children[i] = self.children[i].simplify()
 
         return self
+
+
+class NotOperator(Operator):
+    def simplify(self):
+        if isinstance(self.children[0], NotOperator):
+            return self.children[0].children[0]
+        elif isinstance(self.children[0], AndOperator):
+            self.children[0] = OrOperator(map(NotOperator, self.children[0].children))
+        elif isinstance(self.children[0], OrOperator):
+            self.children[0] = AndOperator(map(NotOperator, self.children[0].children))
+
+        return super().simplify()
+
+    def __str__(self):
+        return self.unary_traverse(operators["not"])
+
+
+class AndOperator(Operator):
+    def __str__(self):
+        return self.multiple_traverse(operators["and"])
+
+
+class OrOperator(Operator):
+    def __str__(self):
+        return self.multiple_traverse(operators["or"])
+
+
+class XorOperator(Operator):
+    def __str__(self):
+        return self.multiple_traverse(operators["xor"])
+
+
+class ImplicationOperator(Operator):
+    def __str__(self):
+        return self.multiple_traverse(operators["implication"])
+
+
+class BiConditionalOperator(Operator):
+    def __str__(self):
+        return self.multiple_traverse(operators["bi-conditional"])
+
+
+class ITEOperator(Operator):
+    def __str__(self):
+        return operators["ite"] + "(" + ", ".join(map(str, self.children)) + ")"

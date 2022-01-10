@@ -7,6 +7,5 @@ class Token(ABC):
     def simplify(self):
         pass
 
-    @abstractmethod
-    def traverse(self):
-        pass
+    def __repr__(self):
+        return str(self)

@@ -10,7 +10,7 @@ class Variable(Token):
     def simplify(self):
         return self
 
-    def traverse(self):
+    def __str__(self):
         return self.name
 
     def __eq__(self, other):
