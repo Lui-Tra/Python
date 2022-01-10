@@ -82,7 +82,7 @@ def preproc_prefix(formel):
     return new_formel
 
 
-def parse(formel):
+def __parse__(formel):
     formel = re.sub(r"\s", "", formel)
     formel = remove_parenthesis(formel)
 
@@ -137,6 +137,11 @@ def parse(formel):
             return op
         else:
             return get_operator(seperator, [parse(token) for token in tokens])
+
+
+def parse(formel):
+    formel = preproc_prefix(formel)
+    return __parse__(formel)
 
 
 if __name__ == "__main__":
