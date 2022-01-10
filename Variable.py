@@ -3,7 +3,7 @@ from Token import Token
 
 class Variable(Token):
     def __init__(self, name, value=True):
-        super().__init__([])
+        super().__init__()
         self.name = name
         self.value = value
 
@@ -11,7 +11,7 @@ class Variable(Token):
         return self
 
     def traverse(self):
-        print(f"{self.name}", end="")
+        return self.name
 
     def __eq__(self, other):
         if isinstance(other, Variable):
