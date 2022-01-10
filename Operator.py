@@ -73,9 +73,6 @@ class AndOrOperator(Operator):
             else:
                 self.children.append(Variable("true", True))
 
-        if len(self.children) == 1:
-            return self.children[0].simplify()
-
         return super().simplify()
 
 
@@ -110,6 +107,9 @@ class AndOperator(AndOrOperator):
         elif Variable("true", True) in self.children:
             self.children.remove(Variable("true", True))
 
+        if len(self.children) == 1:
+            return self.children[0].simplify()
+
         return super().simplify()
 
     def __str__(self):
@@ -124,6 +124,9 @@ class OrOperator(AndOrOperator):
             return Variable("true", True)
         elif Variable("false", False) in self.children:
             self.children.remove(Variable("false", False))
+
+        if len(self.children) == 1:
+            return self.children[0].simplify()
 
         return super().simplify()
 
