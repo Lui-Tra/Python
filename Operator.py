@@ -103,7 +103,12 @@ class NotOperator(Operator):
 
 class AndOperator(AndOrOperator):
     def simplify(self):
-        return super().basic_simplify(AndOperator, OrOperator)
+        super().basic_simplify(AndOperator, OrOperator)
+
+        if Variable("false", False) in self.children:
+            return Variable("false", False)
+
+        return super().simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["and"])
@@ -111,7 +116,12 @@ class AndOperator(AndOrOperator):
 
 class OrOperator(AndOrOperator):
     def simplify(self):
-        return super().basic_simplify(OrOperator, AndOperator)
+        super().basic_simplify(OrOperator, AndOperator)
+
+        if Variable("true", True) in self.children:
+            return Variable("true", True)
+
+        return super().simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["or"])
