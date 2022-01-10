@@ -37,6 +37,7 @@ def find_operator(formel, index):
                         return operator
         return None
 
+
 def parse(formel):
     formel = re.sub(r"\s", "", formel)
     formel = remove_parenthesis(formel)
@@ -75,7 +76,7 @@ def parse(formel):
         elif indent_level == 0 and find_operator(formel, index) == seperator:
             tokens.append(remove_parenthesis(current_token))
             current_token = ""
-            index += len(seperator)-1
+            index += len(seperator) - 1
         else:
             current_token += char
         index += 1
@@ -100,4 +101,3 @@ if __name__ == "__main__":
 
     root = parse(formel)
     print(root)
-
