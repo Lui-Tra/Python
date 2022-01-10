@@ -37,6 +37,35 @@ class Operator(Token, ABC):
         return self
 
 
+class AndOrOperator(Operator):
+    def basic_simplify(self, my_class, other_class):
+        super().simplify()
+
+        to_remove = []
+        for i in range(len(self.children)):
+            if isinstance(self.children[i], Operator):
+                if isinstance(self.children[i], other_class):
+                    for var in self.children:
+                        if isinstance(var, Variable) \
+                                and (isinstance(self.children[i], Variable) or var in self.children[i].children):
+                            self.children[i] = var
+                elif isinstance(self.children[i], my_class):
+                    self.children.extend(self.children[i].children)
+                    to_remove.append(self.children[i])
+
+        for t in to_remove:
+            self.children.remove(t)
+
+        for c in self.children:
+            while self.children.count(c) > 1:
+                self.children.remove(c)
+
+        if len(self.children) == 1:
+            return self.children[0].simplify()
+
+        return super().simplify()
+
+
 class NotOperator(Operator):
     def simplify(self):
         super().simplify()
@@ -54,38 +83,20 @@ class NotOperator(Operator):
         return self.unary_traverse(operators["not"])
 
 
-class AndOperator(Operator):
+class AndOperator(AndOrOperator):
+    def simplify(self):
+        return super().basic_simplify(AndOperator, OrOperator)
+
     def __str__(self):
         return self.multiple_traverse(operators["and"])
 
 
-class OrOperator(Operator):
+class OrOperator(AndOrOperator):
+    def simplify(self):
+        return super().basic_simplify(OrOperator, AndOperator)
+
     def __str__(self):
         return self.multiple_traverse(operators["or"])
-
-    def simplify(self):
-        super().simplify()
-
-        to_remove = []
-        for i in range(len(self.children)):
-            if isinstance(self.children[i], Operator):
-                if isinstance(self.children[i], AndOperator):
-                    for var in self.children:
-                        if isinstance(var, Variable) \
-                                and (isinstance(self.children[i], Variable) or var in self.children[i].children):
-                            self.children[i] = var
-                elif isinstance(self.children[i], OrOperator):
-                    self.children.extend(self.children[i].children)
-                    to_remove.append(self.children[i])
-
-        for t in to_remove:
-            self.children.remove(t)
-
-        for c in self.children:
-            while self.children.count(c) > 1:
-                self.children.remove(c)
-
-        return super().simplify()
 
 
 class XorOperator(Operator):
@@ -108,20 +119,20 @@ class ImplicationOperator(Operator):
         return OrOperator(
             NotOperator(self.children[0]),
             self.children[1]
-        )
+        ).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["implication"])
 
 
 class BiConditionalOperator(Operator):
-    def __str__(self):
-        return self.multiple_traverse(operators["bi-conditional"])
-
     def simplify(self):
         super().simplify()
 
         return NotOperator(XorOperator(self.children)).simplify()
+
+    def __str__(self):
+        return self.multiple_traverse(operators["bi-conditional"])
 
 
 class ITEOperator(Operator):
@@ -131,7 +142,7 @@ class ITEOperator(Operator):
         return AndOperator(
             ImplicationOperator(self.children),
             ImplicationOperator(list(map(NotOperator, self.children)))
-        )
+        ).simplify()
 
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
