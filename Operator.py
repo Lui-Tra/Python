@@ -64,6 +64,8 @@ class OrOperator(Operator):
         return self.multiple_traverse(operators["or"])
 
     def simplify(self):
+        super().simplify()
+
         to_remove = []
         for i in range(len(self.children)):
             if isinstance(self.children[i], Operator):
@@ -88,6 +90,8 @@ class OrOperator(Operator):
 
 class XorOperator(Operator):
     def simplify(self):
+        super().simplify()
+
         return AndOperator([
             OrOperator(self.children),
             OrOperator(list(map(NotOperator, self.children)))
@@ -99,6 +103,8 @@ class XorOperator(Operator):
 
 class ImplicationOperator(Operator):
     def simplify(self):
+        super().simplify()
+
         return OrOperator(
             NotOperator(self.children[0]),
             self.children[1]
@@ -113,11 +119,15 @@ class BiConditionalOperator(Operator):
         return self.multiple_traverse(operators["bi-conditional"])
 
     def simplify(self):
+        super().simplify()
+
         return NotOperator(XorOperator(self.children)).simplify()
 
 
 class ITEOperator(Operator):
     def simplify(self):
+        super().simplify()
+
         return AndOperator(
             ImplicationOperator(self.children),
             ImplicationOperator(list(map(NotOperator, self.children)))

@@ -4,5 +4,5 @@ root = parse("(B ∨ B ⊕ A ∨ A ∨ ((B ∨ B ∨ A ∨ A ∨ (B ∧ F)) ∧ 
 
 if __name__ == "__main__":
     print(root)
-    root.simplify()
+    root = root.simplify()
     print(root)
