@@ -141,7 +141,7 @@ class XorOperator(Operator):
         return AndOperator([
             OrOperator(self.children),
             OrOperator(list(map(NotOperator, self.children)))
-        ])
+        ]).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
