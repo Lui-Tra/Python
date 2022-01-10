@@ -51,13 +51,12 @@ class Operator(Token, ABC):
 
 class NotOperator(Operator):
     def simplify(self):
-        print(self.children)
         if isinstance(self.children[0], NotOperator):
             return self.children[0].children[0]
         elif isinstance(self.children[0], AndOperator):
-            self.children[0] = OrOperator(list(map(NotOperator, self.children[0].children)))
+            self.children[0] = OrOperator(list(map(lambda it: NotOperator([it]), self.children[0].children)))
         elif isinstance(self.children[0], OrOperator):
-            self.children[0] = AndOperator(list(map(NotOperator, self.children[0].children)))
+            self.children[0] = AndOperator(list(map(lambda it: NotOperator([it]), self.children[0].children)))
 
         return super().simplify()
 
