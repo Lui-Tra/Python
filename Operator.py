@@ -17,8 +17,11 @@ def get_operator(operator_name, children):
 
 
 class Operator(Token, ABC):
-    def __init__(self, children):
-        self.children = children
+    def __init__(self, *children):
+        if isinstance(children[0], list):
+            self.children = children[0]
+        else:
+            self.children = list(children)
 
     def unary_traverse(self, operator):
         return operator + str(self.children[0])
@@ -40,9 +43,9 @@ class NotOperator(Operator):
         if isinstance(self.children[0], NotOperator):
             return self.children[0].children[0].simplify()
         if isinstance(self.children[0], AndOperator):
-            return OrOperator(list([NotOperator([it]) for it in self.children[0].children])).simplify()
+            return OrOperator(list(map(NotOperator, self.children[0].children))).simplify()
         elif isinstance(self.children[0], OrOperator):
-            return AndOperator(list([NotOperator([it]) for it in self.children[0].children])).simplify()
+            return AndOperator(list(map(NotOperator, self.children[0].children))).simplify()
 
         return super().simplify()
 
@@ -63,14 +66,8 @@ class OrOperator(Operator):
 class XorOperator(Operator):
     def simplify(self):
         return AndOperator([
-            OrOperator([
-                self.children[0],
-                self.children[1]
-            ]),
-            OrOperator([
-                NotOperator([self.children[0]]),
-                NotOperator([self.children[1]])
-            ])
+            OrOperator(self.children),
+            OrOperator(list(map(NotOperator, self.children)))
         ])
 
     def __str__(self):
@@ -79,10 +76,10 @@ class XorOperator(Operator):
 
 class ImplicationOperator(Operator):
     def simplify(self):
-        return OrOperator([
-            NotOperator([self.children[0]]),
+        return OrOperator(
+            NotOperator(self.children[0]),
             self.children[1]
-        ])
+        )
 
     def __str__(self):
         return self.multiple_traverse(operators["implication"])
@@ -93,15 +90,15 @@ class BiConditionalOperator(Operator):
         return self.multiple_traverse(operators["bi-conditional"])
 
     def simplify(self):
-        return NotOperator([XorOperator(self.children)]).simplify()
+        return NotOperator(XorOperator(self.children)).simplify()
 
 
 class ITEOperator(Operator):
     def simplify(self):
-        return AndOperator([
+        return AndOperator(
             ImplicationOperator(self.children),
-            ImplicationOperator(list(map(lambda it: NotOperator([it]), self.children)))
-        ])
+            ImplicationOperator(list(map(NotOperator, self.children)))
+        )
 
     def __str__(self):
-        return operators["ite"] + "(" + ", ".join(map(str, self.children)) + ")"
+        return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"

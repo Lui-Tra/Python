@@ -1,6 +1,6 @@
 from parser import parse
 
-root = parse("ITE(A, B, C)")
+root = parse("(¬(D ⊕ X) ∧ B)")
 
 if __name__ == "__main__":
     print(root)
