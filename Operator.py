@@ -71,7 +71,7 @@ class XorOperator(Operator):
 
 class ImplicationOperator(Operator):
     def simplify(self):
-        return AndOperator([
+        return OrOperator([
             NotOperator([self.children[0]]),
             self.children[1]
         ])
