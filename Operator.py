@@ -97,5 +97,11 @@ class BiConditionalOperator(Operator):
 
 
 class ITEOperator(Operator):
+    def simplify(self):
+        return AndOperator([
+            ImplicationOperator(self.children),
+            ImplicationOperator(list(map(lambda it: NotOperator([it]), self.children)))
+        ])
+
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(map(str, self.children)) + ")"
