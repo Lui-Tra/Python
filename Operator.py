@@ -61,12 +61,20 @@ class OrOperator(Operator):
 
 
 class XorOperator(Operator):
+    def simplify(self):
+        return AndOperator([
+            OrOperator([
+                self.children[0],
+                self.children[1]
+            ]),
+            OrOperator([
+                NotOperator([self.children[0]]),
+                NotOperator([self.children[1]])
+            ])
+        ])
+
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
-
-    def simplify(self):
-        print("Hello World")
-        return super().simplify()
 
 
 class ImplicationOperator(Operator):
