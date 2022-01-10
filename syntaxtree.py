@@ -1,6 +1,6 @@
 from parser import parse
 
-root = parse("A ")
+root = parse("A ∨ B ∨ ¬A")
 
 if __name__ == "__main__":
     print(root)

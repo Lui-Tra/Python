@@ -60,6 +60,19 @@ class AndOrOperator(Operator):
             while self.children.count(c) > 1:
                 self.children.remove(c)
 
+        to_remove = []
+        for child in self.children:
+            if NotOperator(child) in self.children:
+                to_remove.append(child)
+
+        for t in to_remove:
+            self.children.remove(t)
+            self.children.remove(NotOperator(t))
+            if my_class == AndOperator:
+                self.children.append(Variable("false", False))
+            else:
+                self.children.append(Variable("true", True))
+
         if len(self.children) == 1:
             return self.children[0].simplify()
 
@@ -81,6 +94,11 @@ class NotOperator(Operator):
 
     def __str__(self):
         return self.unary_traverse(operators["not"])
+
+    def __eq__(self, other):
+        if isinstance(other, NotOperator):
+            return self.children == other.children
+        return False
 
 
 class AndOperator(AndOrOperator):
