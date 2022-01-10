@@ -84,6 +84,9 @@ class BiConditionalOperator(Operator):
     def __str__(self):
         return self.multiple_traverse(operators["bi-conditional"])
 
+    def simplify(self):
+        return NotOperator([OrOperator(self.children)]).simplify()
+
 
 class ITEOperator(Operator):
     def __str__(self):
