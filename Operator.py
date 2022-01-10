@@ -107,6 +107,8 @@ class AndOperator(AndOrOperator):
 
         if Variable("false", False) in self.children:
             return Variable("false", False)
+        elif Variable("true", True) in self.children:
+            self.children.remove(Variable("true", True))
 
         return super().simplify()
 
@@ -120,6 +122,8 @@ class OrOperator(AndOrOperator):
 
         if Variable("true", True) in self.children:
             return Variable("true", True)
+        elif Variable("false", False) in self.children:
+            self.children.remove(Variable("false", False))
 
         return super().simplify()
 
