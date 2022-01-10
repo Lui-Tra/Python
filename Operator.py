@@ -40,9 +40,9 @@ class NotOperator(Operator):
         if isinstance(self.children[0], NotOperator):
             return self.children[0].children[0].simplify()
         if isinstance(self.children[0], AndOperator):
-            return OrOperator(list(map(lambda it: NotOperator([it]), self.children[0].children))).simplify()
+            return OrOperator(list([NotOperator([it]) for it in self.children[0].children])).simplify()
         elif isinstance(self.children[0], OrOperator):
-            return AndOperator(list(map(lambda it: NotOperator([it]), self.children[0].children))).simplify()
+            return AndOperator(list([NotOperator([it]) for it in self.children[0].children])).simplify()
 
         return super().simplify()
 

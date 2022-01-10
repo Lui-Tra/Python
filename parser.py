@@ -87,7 +87,6 @@ def parse(formel):
     else:
         if seperator == "¬":
             op = get_operator(seperator, [parse(tokens[-1])])
-            print(len(tokens))
             for i in range(len(tokens) - 2):
                 op = get_operator(seperator, [op])
             return op
