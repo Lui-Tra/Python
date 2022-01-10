@@ -1,6 +1,6 @@
 from parser import parse
 
-root = parse("ITE(true, B, C)")
+root = parse("ITE(A, B, C)")
 operators = {
     "not": "¬",
     "and": "∧",

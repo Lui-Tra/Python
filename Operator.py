@@ -180,7 +180,7 @@ class ITEOperator(Operator):
 
         return AndOperator(
             ImplicationOperator(self.children[0], self.children[1]),
-            ImplicationOperator(NotOperator(self.children[1]), self.children[2])
+            ImplicationOperator(NotOperator(self.children[0]), self.children[2])
         ).simplify()
 
     def __str__(self):
