@@ -38,13 +38,14 @@ def find_operator(formel, index):
                         return operator
         return None
 
+
 def preproc_prefix(formel):
     index = 0
     new_formel = ""
     while index < len(formel):
         char = formel[index]
         for operator in prefix_operators:
-            if operator.startswith(char) and formel[index:index+len(operator)] == operator:
+            if operator.startswith(char) and formel[index:index + len(operator)] == operator:
                 index += len(operator)
                 char = formel[index]
                 if char != "(":
@@ -74,7 +75,7 @@ def preproc_prefix(formel):
 
                 tokens = [preproc_prefix(token) for token in tokens]
 
-                new_formel += "("+(" "+operator+" ").join(tokens)+")"
+                new_formel += "(" + (" " + operator + " ").join(tokens) + ")"
                 break
         else:
             new_formel += char

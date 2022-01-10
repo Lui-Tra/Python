@@ -82,10 +82,14 @@ class NotOperator(Operator):
 
         if isinstance(self.children[0], NotOperator):
             return self.children[0].children[0].simplify()
-        if isinstance(self.children[0], AndOperator):
+        elif isinstance(self.children[0], AndOperator):
             return OrOperator(list(map(NotOperator, self.children[0].children))).simplify()
         elif isinstance(self.children[0], OrOperator):
             return AndOperator(list(map(NotOperator, self.children[0].children))).simplify()
+        elif isinstance(self.children[0], Variable) and self.children[0] == Variable("true", True):
+            return Variable("false", False)
+        elif isinstance(self.children[0], Variable) and self.children[0] == Variable("false", False):
+            return Variable("true", True)
 
         return super().simplify()
 
@@ -175,8 +179,8 @@ class ITEOperator(Operator):
         super().simplify()
 
         return AndOperator(
-            ImplicationOperator(self.children),
-            ImplicationOperator(list(map(NotOperator, self.children)))
+            ImplicationOperator(self.children[0], self.children[1]),
+            ImplicationOperator(NotOperator(self.children[1]), self.children[2])
         ).simplify()
 
     def __str__(self):
