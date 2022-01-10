@@ -1,6 +1,7 @@
 from abc import ABC
 
 from Token import Token
+from Variable import Variable
 from constants import operators
 
 
@@ -61,6 +62,28 @@ class AndOperator(Operator):
 class OrOperator(Operator):
     def __str__(self):
         return self.multiple_traverse(operators["or"])
+
+    def simplify(self):
+        to_remove = []
+        for i in range(len(self.children)):
+            if isinstance(self.children[i], Operator):
+                if isinstance(self.children[i], AndOperator):
+                    for var in self.children:
+                        if isinstance(var, Variable) \
+                                and (isinstance(self.children[i], Variable) or var in self.children[i].children):
+                            self.children[i] = var
+                elif isinstance(self.children[i], OrOperator):
+                    self.children.extend(self.children[i].children)
+                    to_remove.append(self.children[i])
+
+        for t in to_remove:
+            self.children.remove(t)
+
+        for c in self.children:
+            while self.children.count(c) > 1:
+                self.children.remove(c)
+
+        return super().simplify()
 
 
 class XorOperator(Operator):
