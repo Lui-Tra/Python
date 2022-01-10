@@ -81,6 +81,10 @@ class XorOperator(Operator):
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
 
+    def simplify(self):
+        print("Hello World")
+        return super().simplify()
+
 
 class ImplicationOperator(Operator):
     def __str__(self):
