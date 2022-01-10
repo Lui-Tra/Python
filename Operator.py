@@ -51,10 +51,10 @@ class Operator(Token, ABC):
 
 class NotOperator(Operator):
     def simplify(self):
+        super().simplify()
+
         if isinstance(self.children[0], NotOperator):
             return self.children[0].children[0]
-
-        super().simplify()
 
         if isinstance(self.children[0], AndOperator):
             self.children[0] = OrOperator(list(map(lambda it: NotOperator([it]), self.children[0].children)))
@@ -87,6 +87,12 @@ class XorOperator(Operator):
 
 
 class ImplicationOperator(Operator):
+    def simplify(self):
+        return AndOperator([
+            NotOperator([self.children[0]]),
+            self.children[1]
+        ])
+
     def __str__(self):
         return self.multiple_traverse(operators["implication"])
 
