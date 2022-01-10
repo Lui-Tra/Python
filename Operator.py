@@ -1,13 +1,18 @@
 from abc import ABC
 
-from NotOperator import NotOperator
 from Token import Token
 from constants import operators
 
 
+operator_registry = {}
+
+
 def get_operator(operator_name, children):
-    if operator_name == operators["not"]:
-        return NotOperator(children)
+    return operator_registry[operator_name](children)
+
+
+def register_operator(operator_name, cls):
+    operator_registry[operator_name] = cls
 
 
 class Operator(Token, ABC):

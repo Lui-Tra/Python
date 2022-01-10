@@ -1,5 +1,6 @@
 from constants import operators
 from Operator import Operator
+from Operator import register_operator
 
 
 class NotOperator(Operator):
@@ -11,6 +12,9 @@ class NotOperator(Operator):
 
     def traverse(self):
         return self.unary_traverse(operators["not"])
+
+
+register_operator("not", NotOperator)
 
 
 """
