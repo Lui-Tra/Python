@@ -38,9 +38,9 @@ def find_operator(formel, index):
                         return operator
         return None
 
-
 def preproc_prefix(formel):
     index = 0
+    new_formel = ""
     while index < len(formel):
         char = formel[index]
         for operator in prefix_operators:
@@ -51,33 +51,40 @@ def preproc_prefix(formel):
                     raise SyntaxError
                 indent_level = 1
                 index += 1
-
+                tokens = []
                 current_token = ""
-
                 while indent_level > 0 and index < len(formel):
                     char = formel[index]
                     if char == "(":
+                        current_token += char
                         indent_level += 1
                     elif char == ")":
+                        if indent_level > 1:
+                            current_token += char
                         indent_level -= 1
+                    elif indent_level == 1 and char == ",":
+                        tokens.append(current_token)
+                        current_token = ""
                     else:
                         current_token += char
-
                     index += 1
-
-                print("current_token", (" "+operator+" ").join(current_token.split(",")))
+                tokens.append(current_token)
                 if indent_level > 0:
                     raise SyntaxError
+
+                tokens = [preproc_prefix(token) for token in tokens]
+
+                new_formel += "("+(" "+operator+" ").join(tokens)+")"
                 break
+        else:
+            new_formel += char
         index += 1
-    return formel
+    return new_formel
 
 
 def parse(formel):
     formel = re.sub(r"\s", "", formel)
     formel = remove_parenthesis(formel)
-
-    formel = preproc_prefix(formel)
 
     index = 0
     indent_level = 0
@@ -133,7 +140,11 @@ def parse(formel):
 
 
 if __name__ == "__main__":
-    formel = "ITE(a, b, c)"
+    formel = "ITE(a, b, ITE(d, e))"
+
+    formel = preproc_prefix(formel)
+
+    print(formel)
 
     root = parse(formel)
-    print(type(root), root.children)
+    print(root)
