@@ -131,12 +131,12 @@ def __parse__(formel):
         return Variable(tokens[0])
     else:
         if seperator == "¬":
-            op = get_operator(seperator, [parse(tokens[-1])])
+            op = get_operator(seperator, [__parse__(tokens[-1])])
             for i in range(len(tokens) - 2):
                 op = get_operator(seperator, [op])
             return op
         else:
-            return get_operator(seperator, [parse(token) for token in tokens])
+            return get_operator(seperator, [__parse__(token) for token in tokens])
 
 
 def parse(formel):
