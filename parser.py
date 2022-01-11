@@ -39,6 +39,12 @@ def find_operator(formel, index):
         return None
 
 
+def preproc_names(formel):
+    for name, symbol in operators.values():
+        formel = formel.replace(name, symbol)
+    return formel
+
+
 def preproc_prefix(formel):
     index = 0
     new_formel = ""
@@ -141,6 +147,7 @@ def __parse__(formel):
 
 
 def parse(formel):
+    formel = preproc_names(formel)
     formel = preproc_prefix(formel)
     return __parse__(formel)
 
