@@ -163,8 +163,8 @@ class Parser:
                 return get_operator(seperator, [self.__parse__(token) for token in tokens])
 
 
-def parse(formel):
-    return Parser().parse(formel)
+def parse(formula):
+    return Parser().parse(formula)
 
 
 if __name__ == "__main__":
