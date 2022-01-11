@@ -166,7 +166,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "not (Willi and Peter or A)"
+    formula = "not ((A xor B) or A)"
 
     root = parse(formula)
     print(root)

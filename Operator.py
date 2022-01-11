@@ -39,6 +39,15 @@ class Operator(Token, ABC):
 
 
 class AndOrOperator(Operator, ABC):
+    def get_truth_table_entry(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_entry()
+            res += center(self.value, 3)
+        res = res[:-3]
+        res += ")"
+        return res
+
     def basic_simplify(self, my_class, other_class):
         super().nnf()
 
@@ -130,15 +139,6 @@ class AndOperator(AndOrOperator):
         res += ")"
         return res
 
-    def get_truth_table_entry(self):
-        res = "("
-        for child in self.children:
-            res += child.get_truth_table_entry()
-            res += center(self.value, 3)
-        res = res[:-3]
-        res += ")"
-        return res
-
     def nnf(self):
         super().basic_simplify(AndOperator, OrOperator)
 
@@ -164,6 +164,15 @@ class OrOperator(AndOrOperator):
                 self.value = True
         return self.value
 
+    def get_truth_table_header(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += " " + operators["or"] + " "
+        res = res[:-3]
+        res += ")"
+        return res
+
     def nnf(self):
         super().basic_simplify(OrOperator, AndOperator)
 
@@ -187,6 +196,24 @@ class XorOperator(Operator):
         b = self.children[1].calculate_value()
         self.value = (a and not b) or (not a and b)
         return self.value
+
+    def get_truth_table_header(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += center(operators["xor"], 3)
+        res = res[:-3]
+        res += ")"
+        return res
+
+    def get_truth_table_entry(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_entry()
+            res += center(self.value, 3)
+        res = res[:-3]
+        res += ")"
+        return res
 
     def nnf(self):
         super().nnf()

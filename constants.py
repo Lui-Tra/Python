@@ -1,5 +1,3 @@
-import math
-
 operators = {
     "not": "¬",
     "and": "∧",
