@@ -58,7 +58,9 @@ class Parser:
 
     @classmethod
     def preproc_names(cls, formula):
-        for name, symbol in operators.items():
+        sorted_operators = list(operators.items())
+        sorted_operators.sort(key=lambda item: len(item[0]), reverse=True)
+        for name, symbol in sorted_operators:
             formula = formula.replace(name, symbol)
         return formula
 
