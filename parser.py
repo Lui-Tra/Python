@@ -40,7 +40,7 @@ def find_operator(formel, index):
 
 
 def preproc_names(formel):
-    for name, symbol in operators.values():
+    for name, symbol in operators.items():
         formel = formel.replace(name, symbol)
     return formel
 
