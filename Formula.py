@@ -99,5 +99,8 @@ class Formula:
             self.root = AndOperator(new_terms)
         return self
 
+    def clone(self):
+        return Formula(self.root.clone())
+
     def __str__(self):
         return str(self.root)

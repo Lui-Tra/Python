@@ -46,6 +46,9 @@ class Operator(Token, ABC):
 
         return self
 
+    def clone(self):
+        return self.__class__([child.clone for child in self.children])
+
 
 class AndOrOperator(Operator, ABC):
     def basic_simplify(self, my_class, other_class):

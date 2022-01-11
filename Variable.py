@@ -27,3 +27,6 @@ class Variable(Token):
         if isinstance(other, Variable):
             return self.name == other.name
         return False
+
+    def clone(self):
+        return Variable(self.name, self.value)
