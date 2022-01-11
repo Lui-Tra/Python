@@ -5,6 +5,7 @@ def center(string, size):
     return " " * math.floor(size / 2) + string + " " * math.ceil(size / 2)
 
 
+
 class Formula:
     def __init__(self, root=None, variables=None):
         if variables is None:
@@ -13,8 +14,8 @@ class Formula:
         self.variables = variables
 
     def print_truth_table(self):
-        vars = list(self.variables.values())
-        for var in vars:
+        variables = list(self.variables.values())
+        for var in variables:
             var.value = False
 
         self.print_table_header()
@@ -22,14 +23,14 @@ class Formula:
         self.root.calculate_value()
         self.print_values()
 
-        for i in range(2 ** len(vars) - 1):
+        for i in range(2 ** len(variables) - 1):
 
             index = -1
-            while index < 0 and vars[index].value:
-                vars[index].value = False
+            while index < 0 and variables[index].value:
+                variables[index].value = False
                 index -= 1
             if index <= 0:
-                vars[index].value = True
+                variables[index].value = True
 
             self.root.calculate_value()
             self.print_values()
