@@ -166,8 +166,8 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "not (Willi and Peter)"
+    formula = "not (Willi and Peter or A)"
 
     root = parse(formula)
-
+    print(root)
     root.print_truth_table()

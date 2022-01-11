@@ -1,4 +1,5 @@
 from Operator import NotOperator, AndOperator, OrOperator
+from constants import center
 
 
 class Formula:
@@ -36,7 +37,7 @@ class Formula:
 
     def print_values(self):
         for name, var in self.variables.items():
-            val = center(str(int(var.value)), len(name) - 1)
+            val = center(str(int(var.value)), len(name))
             print(val, end=" | ")
         print(self.root.get_truth_table_entry())
 
