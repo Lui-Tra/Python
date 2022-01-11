@@ -66,20 +66,20 @@ class Parser:
     def preproc_prefix(cls, formula):
         index = 0
         new_formula = ""
-        while index < len(formel):
-            char = formel[index]
+        while index < len(formula):
+            char = formula[index]
             for operator in prefix_operators:
-                if operator.startswith(char) and formel[index:index + len(operator)] == operator:
+                if operator.startswith(char) and formula[index:index + len(operator)] == operator:
                     index += len(operator)
-                    char = formel[index]
+                    char = formula[index]
                     if char != "(":
                         raise SyntaxError
                     indent_level = 1
                     index += 1
                     tokens = []
                     current_token = ""
-                    while indent_level > 0 and index < len(formel):
-                        char = formel[index]
+                    while indent_level > 0 and index < len(formula):
+                        char = formula[index]
                         if char == "(":
                             current_token += char
                             indent_level += 1
@@ -96,9 +96,7 @@ class Parser:
                     tokens.append(current_token)
                     if indent_level > 0:
                         raise SyntaxError
-
                     tokens = [cls.preproc_prefix(token) for token in tokens]
-
                     new_formula += "(" + (" " + operator + " ").join(tokens) + ")"
                     break
             else:
@@ -168,10 +166,10 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formel = "ITE(a, value, ITE(de, a, d))"
+    formula = "ITE(a, value, ITE(de, a, d))"
 
-    print(formel)
+    print(formula)
 
-    root = parse(formel)
+    root = parse(formula)
 
     print(type(root), root.print_truth_table())
