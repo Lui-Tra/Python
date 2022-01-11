@@ -12,5 +12,5 @@ operators = {
 }
 if __name__ == "__main__":
     print(root)
-    root = root.simplify()
+    root = root.nnf()
     print(root)

@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 class Token(ABC):
     @abstractmethod
-    def simplify(self):
+    def nnf(self):
         pass
 
     def __repr__(self):

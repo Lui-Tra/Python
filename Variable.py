@@ -7,7 +7,7 @@ class Variable(Token):
         self.name = name
         self.value = value
 
-    def simplify(self):
+    def nnf(self):
         return self
 
     def __str__(self):
