@@ -17,10 +17,10 @@ class Parser:
             self.variables[name] = Variable(name)
         return self.variables[name]
 
-    def parse(self, formel):
-        formel = self.preproc_names(formel)
-        formel = self.preproc_prefix(formel)
-        return Formula(self.__parse__(formel), self.variables)
+    def parse(self, formula):
+        formula = self.preproc_names(formula)
+        formula = self.preproc_prefix(formula)
+        return Formula(self.__parse__(formula), self.variables)
 
     @classmethod
     def remove_parenthesis(cls, token):
