@@ -31,12 +31,13 @@ class Operator(Token, ABC):
     def multiple_traverse(self, operator):
         return "(" + (" " + operator + " ").join(map(str, self.children)) + ")"
 
-    def get_truth_table_entry(self):
+    def get_truth_table_entry(self, depth):
         res = "("
+        op_str = center(self.value, 3, depth)
         for child in self.children:
-            res += child.get_truth_table_entry()
-            res += center(self.value, 3)
-        res = res[:-3]
+            res += child.get_truth_table_entry(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
         res += ")"
         return res
 
@@ -91,11 +92,11 @@ class NotOperator(Operator):
         self.value = not self.children[0].calculate_value()
         return self.value
 
-    def get_truth_table_header(self):
-        return center(operators["not"], 2) + self.children[0].get_truth_table_header()
+    def get_truth_table_header(self, depth):
+        return center(operators["not"], 2, depth) + self.children[0].get_truth_table_header(depth + 1)
 
-    def get_truth_table_entry(self):
-        return center(self.value, 2) + self.children[0].get_truth_table_entry()
+    def get_truth_table_entry(self, depth):
+        return center(self.value, 2, depth) + self.children[0].get_truth_table_entry(depth + 1)
 
     def nnf(self):
         super().nnf()
@@ -130,12 +131,13 @@ class AndOperator(AndOrOperator):
                 self.value = False
         return self.value
 
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         res = "("
+        op_str = center(operators["and"], 3, depth)
         for child in self.children:
-            res += child.get_truth_table_header()
-            res += " " + operators["and"] + " "
-        res = res[:-3]
+            res += child.get_truth_table_header(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
         res += ")"
         return res
 
@@ -164,12 +166,13 @@ class OrOperator(AndOrOperator):
                 self.value = True
         return self.value
 
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         res = "("
+        op_str = center(operators["or"], 3, depth)
         for child in self.children:
-            res += child.get_truth_table_header()
-            res += " " + operators["or"] + " "
-        res = res[:-3]
+            res += child.get_truth_table_header(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
         res += ")"
         return res
 
@@ -197,12 +200,13 @@ class XorOperator(Operator):
         self.value = (a and not b) or (not a and b)
         return self.value
 
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         res = "("
+        op_str = center(operators["xor"], 3, depth)
         for child in self.children:
-            res += child.get_truth_table_header()
-            res += center(operators["xor"], 3)
-        res = res[:-3]
+            res += child.get_truth_table_header(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
         res += ")"
         return res
 
@@ -225,11 +229,11 @@ class ImplicationOperator(Operator):
         self.value = not a or b
         return self.value
 
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         res = "("
         for child in self.children:
-            res += child.get_truth_table_header()
-            res += center(operators["implication"], 3)
+            res += child.get_truth_table_header(depth + 1)
+            res += center(operators["implication"], 3, depth)
         res = res[:-3]
         res += ")"
         return res
@@ -253,12 +257,13 @@ class BiConditionalOperator(Operator):
         self.value = (a and b) or (not a and not b)
         return self.value
 
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         res = "("
+        op_str = center(operators["bi-conditional"], 3, depth)
         for child in self.children:
-            res += child.get_truth_table_header()
-            res += center(operators["bi-conditional"], 3)
-        res = res[:-3]
+            res += child.get_truth_table_header(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
         res += ")"
         return res
 
@@ -279,19 +284,19 @@ class ITEOperator(Operator):
         self.value = (not a or b) and (a or c)
         return self.value
 
-    def get_truth_table_header(self):
-        res = "ITE("
+    def get_truth_table_header(self, depth):
+        res = center("ITE", 3, depth) + "("
         for child in self.children:
-            res += child.get_truth_table_header()
+            res += child.get_truth_table_header(depth + 1)
             res += ", "
         res = res[:-2]
         res += ")"
         return res
 
-    def get_truth_table_entry(self):
-        res = center(self.value, 3) + "("
+    def get_truth_table_entry(self, depth):
+        res = center(self.value, 3, depth) + "("
         for child in self.children:
-            res += child.get_truth_table_entry()
+            res += child.get_truth_table_entry(depth + 1)
             res += ", "
         res = res[:-2]
         res += ")"

@@ -11,11 +11,11 @@ class Variable(Token):
     def calculate_value(self):
         return self.value
 
-    def get_truth_table_header(self):
-        return center(self.name, len(self.name))
+    def get_truth_table_header(self, depth):
+        return center(self.name, len(self.name), depth=depth)
 
-    def get_truth_table_entry(self):
-        return center(self.value, len(self.name))
+    def get_truth_table_entry(self, depth):
+        return center(self.value, len(self.name), depth=depth)
 
     def nnf(self):
         return self

@@ -1,8 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 
-from constants import center
-
 
 class Token(ABC):
     def __init__(self):
@@ -13,11 +11,11 @@ class Token(ABC):
         pass
 
     @abstractmethod
-    def get_truth_table_header(self):
+    def get_truth_table_header(self, depth):
         pass
 
     @abstractmethod
-    def get_truth_table_entry(self):
+    def get_truth_table_entry(self, depth):
         pass
 
     @abstractmethod

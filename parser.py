@@ -168,7 +168,8 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "ITE(true, B, C)"
+    formula = "ITE(A or B, C, D)"
 
     root = parse(formula)
+    root.nnf()
     root.print_truth_table()

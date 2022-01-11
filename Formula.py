@@ -33,13 +33,13 @@ class Formula:
     def print_table_header(self):
         for name in self.variables:
             print(name, end=" | ")
-        print(self.root.get_truth_table_header())
+        print(self.root.get_truth_table_header(0))
 
     def print_values(self):
         for name, var in self.variables.items():
             val = center(str(int(var.value)), len(name))
             print(val, end=" | ")
-        print(self.root.get_truth_table_entry())
+        print(self.root.get_truth_table_entry(0))
 
     def nnf(self):
         self.root = self.root.nnf()
