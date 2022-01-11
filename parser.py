@@ -9,7 +9,7 @@ from Variable import Variable
 
 class Parser:
     def __init__(self):
-        self.formel = None
+        self.formula = None
         self.variables = {}
 
     def __create_variable__(self, name):
@@ -44,28 +44,28 @@ class Parser:
             return token
 
     @classmethod
-    def find_operator(cls, formel, index):
-        char = formel[index]
+    def find_operator(cls, formula, index):
+        char = formula[index]
         if char in operators.values():
             return char
         else:
             for operator in operators.values():
-                if index + (len(operator) - 1) <= len(formel):
+                if index + (len(operator) - 1) <= len(formula):
                     if operator.startswith(char):
-                        if formel[index:index + len(operator)] == operator:
+                        if formula[index:index + len(operator)] == operator:
                             return operator
             return None
 
     @classmethod
-    def preproc_names(cls, formel):
+    def preproc_names(cls, formula):
         for name, symbol in operators.items():
-            formel = formel.replace(name, symbol)
-        return formel
+            formula = formula.replace(name, symbol)
+        return formula
 
     @classmethod
-    def preproc_prefix(cls, formel):
+    def preproc_prefix(cls, formula):
         index = 0
-        new_formel = ""
+        new_formula = ""
         while index < len(formel):
             char = formel[index]
             for operator in prefix_operators:
@@ -99,28 +99,28 @@ class Parser:
 
                     tokens = [cls.preproc_prefix(token) for token in tokens]
 
-                    new_formel += "(" + (" " + operator + " ").join(tokens) + ")"
+                    new_formula += "(" + (" " + operator + " ").join(tokens) + ")"
                     break
             else:
-                new_formel += char
+                new_formula += char
             index += 1
-        return new_formel
+        return new_formula
 
-    def __parse__(self, formel):
-        formel = re.sub(r"\s", "", formel)
-        formel = self.remove_parenthesis(formel)
+    def __parse__(self, formula):
+        formula = re.sub(r"\s", "", formula)
+        formula = self.remove_parenthesis(formula)
 
         index = 0
         indent_level = 0
         min_binding_priority = -1
-        while index < len(formel):
-            char = formel[index]
+        while index < len(formula):
+            char = formula[index]
             if char == "(":
                 indent_level += 1
             elif char == ")":
                 indent_level -= 1
             elif indent_level == 0:
-                operator = self.find_operator(formel, index)
+                operator = self.find_operator(formula, index)
                 if operator is not None:
                     binding_priority = list(operators.values()).index(operator)
                     if binding_priority > min_binding_priority:
@@ -134,15 +134,15 @@ class Parser:
         current_token = ""
         tokens = []
         seperator = list(operators.values())[min_binding_priority]
-        while index < len(formel):
-            char = formel[index]
+        while index < len(formula):
+            char = formula[index]
             if char == "(":
                 current_token += char
                 indent_level += 1
             elif char == ")":
                 current_token += char
                 indent_level -= 1
-            elif indent_level == 0 and self.find_operator(formel, index) == seperator:
+            elif indent_level == 0 and self.find_operator(formula, index) == seperator:
                 tokens.append(self.remove_parenthesis(current_token))
                 current_token = ""
                 index += len(seperator) - 1
@@ -151,7 +151,6 @@ class Parser:
             index += 1
         tokens.append(self.remove_parenthesis(current_token))
 
-        #create formula root
         if len(tokens) == 1:
             return self.__create_variable__(tokens[0])
         else:
