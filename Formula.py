@@ -1,7 +1,9 @@
 import math
 
+
 def center(string, size):
-    return " "*math.floor(size/2)+string+" "*math.ceil(size/2)
+    return " " * math.floor(size / 2) + string + " " * math.ceil(size / 2)
+
 
 class Formula:
     def __init__(self, root=None, variables=None):
@@ -39,9 +41,9 @@ class Formula:
 
     def print_values(self):
         for name, var in self.variables.items():
-            val = center(str(int(var.value)), len(name)-1)
+            val = center(str(int(var.value)), len(name) - 1)
             print(val, end=" | ")
-        print(center(str(int(self.root.value)), len(str(self.root))/2))
+        print(center(str(int(self.root.value)), len(str(self.root)) / 2))
 
     def nnf(self):
         self.root = self.root.nnf()
