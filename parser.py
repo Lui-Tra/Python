@@ -169,10 +169,10 @@ def parse(formel):
 
 
 if __name__ == "__main__":
-    formel = "ITE(a, b, ITE(d, a))"
+    formel = "ITE(a, value, ITE(de, a, d))"
 
     print(formel)
 
     root = parse(formel)
 
-    print(type(root), root.variables)
+    print(type(root), root.print_truth_table())

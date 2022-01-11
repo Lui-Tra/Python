@@ -155,7 +155,7 @@ class OrOperator(AndOrOperator):
 
     def __str__(self):
         return self.multiple_traverse(operators["or"])
-
+        return True
 
 class XorOperator(Operator):
     def calculate_value(self):
