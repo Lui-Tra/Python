@@ -2,7 +2,7 @@ from abc import ABC
 
 from Token import Token
 from Variable import Variable
-from constants import operators
+from constants import operators, center
 
 
 def get_operator(operator_name, children):
@@ -82,6 +82,12 @@ class NotOperator(Operator):
         self.value = not self.children[0].calculate_value()
         return self.value
 
+    def get_truth_table_header(self):
+        return center(operators["not"], 2) + self.children[0].get_truth_table_header()
+
+    def get_truth_table_entry(self):
+        return center(self.value, 2) + self.children[0].get_truth_table_entry()
+
     def nnf(self):
         super().nnf()
 
@@ -114,6 +120,24 @@ class AndOperator(AndOrOperator):
             if not c.calculate_value():
                 self.value = False
         return self.value
+
+    def get_truth_table_header(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += " " + operators["and"] + " "
+        res = res[:-3]
+        res += ")"
+        return res
+
+    def get_truth_table_entry(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_entry()
+            res += center(self.value, 3)
+        res = res[:-3]
+        res += ")"
+        return res
 
     def nnf(self):
         super().basic_simplify(AndOperator, OrOperator)

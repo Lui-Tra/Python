@@ -1,9 +1,4 @@
-import math
-
 from Operator import NotOperator, AndOperator, OrOperator
-
-def center(string, size):
-    return " " * math.floor(size / 2) + string + " " * math.ceil(size / 2)
 
 
 class Formula:
@@ -24,7 +19,6 @@ class Formula:
         self.print_values()
 
         for i in range(2 ** len(variables) - 1):
-
             index = -1
             while index < 0 and variables[index].value:
                 variables[index].value = False
@@ -38,13 +32,13 @@ class Formula:
     def print_table_header(self):
         for name in self.variables:
             print(name, end=" | ")
-        print(str(self))
+        print(self.root.get_truth_table_header())
 
     def print_values(self):
         for name, var in self.variables.items():
             val = center(str(int(var.value)), len(name) - 1)
             print(val, end=" | ")
-        print(center(str(int(self.root.value)), len(str(self.root)) / 2))
+        print(self.root.get_truth_table_entry())
 
     def nnf(self):
         self.root = self.root.nnf()
@@ -103,7 +97,6 @@ class Formula:
         else:
             self.root = AndOperator(new_terms)
         return self
-
 
     def __str__(self):
         return str(self.root)

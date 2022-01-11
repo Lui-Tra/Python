@@ -24,8 +24,8 @@ def show_kv_diagramm(diagramm, scale=1, block_width=50, border_width=3, side_dis
                                   scale * (block_width + 2 * border_width),
                                   scale * (block_width + 2 * border_width)]
                                  )
-                color = "red" if diagramm[row][col] else "white"
 
+                color = "red" if diagramm[row][col] else "white"
                 pygame.draw.rect(screen,
                                  color,
                                  [scale * (side_distance + border_width + col * (border_width + block_width)),
