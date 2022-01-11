@@ -3,8 +3,6 @@ from abc import ABC
 from Token import Token
 from Variable import Variable
 from constants import operators
-from parser import parse
-
 
 def get_operator(operator_name, children):
     return {
