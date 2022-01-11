@@ -14,7 +14,10 @@ class Parser:
 
     def __create_variable__(self, name):
         if name not in self.variables:
-            self.variables[name] = Variable(name)
+            if name == "false":
+                self.variables[name] = Variable("false", False)
+            else:
+                self.variables[name] = Variable(name)
         return self.variables[name]
 
     def parse(self, formula):
@@ -168,7 +171,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "not ((A xor B) or A)"
+    formula = "a or true"
 
     root = parse(formula)
     print(root)

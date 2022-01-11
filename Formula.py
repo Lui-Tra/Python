@@ -10,7 +10,7 @@ class Formula:
         self.variables = variables
 
     def print_truth_table(self):
-        variables = list(self.variables.values())
+        variables = [var for var in self.variables.values() if var.name not in ["true", "false"]]
         for var in variables:
             var.value = False
 
@@ -49,7 +49,7 @@ class Formula:
         return {name: var.value for name, var in self.variables.items()}
 
     def get_truth_table(self):
-        variables = list(self.variables.values())
+        variables = [var for var in self.variables.values() if var.name not in ["true", "false"]]
         for var in variables:
             var.value = False
         yield self.get_values(), self.root.calculate_value()
