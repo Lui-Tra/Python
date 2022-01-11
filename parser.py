@@ -168,8 +168,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "not ((A xor B) or A)"
+    formula = "ITE(true, B, C)"
 
     root = parse(formula)
-    print(root)
     root.print_truth_table()
