@@ -1,4 +1,6 @@
 import re
+
+from Formula import Formula
 from constants import operators
 from constants import prefix_operators
 from Operator import get_operator
@@ -147,8 +149,8 @@ def __parse__(formel):
 
 
 def parse(formel):
-    formel = preproc_names(formel)
-    formel = preproc_prefix(formel)
+    formel = preproc_names(formel, formula)
+    formel = preproc_prefix(formel, formula)
     return __parse__(formel)
 
 
