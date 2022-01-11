@@ -112,6 +112,7 @@ class AndOperator(AndOrOperator):
         for c in self.children:
             if not c.calculate_value():
                 self.current_value = False
+        return self.current_value
 
     def nnf(self):
         super().basic_simplify(AndOperator, OrOperator)
@@ -136,6 +137,7 @@ class OrOperator(AndOrOperator):
         for c in self.children:
             if c.calculate_value():
                 self.current_value = True
+        return self.current_value
 
     def nnf(self):
         super().basic_simplify(OrOperator, AndOperator)
@@ -156,7 +158,10 @@ class OrOperator(AndOrOperator):
 
 class XorOperator(Operator):
     def calculate_value(self):
-
+        a = self.children[0].calculate_value()
+        b = self.children[1].calculate_value()
+        self.current_value = (a and not b) or (not a and b)
+        return self.current_value
 
     def nnf(self):
         super().nnf()
@@ -171,6 +176,12 @@ class XorOperator(Operator):
 
 
 class ImplicationOperator(Operator):
+    def calculate_value(self):
+        a = self.children[0].calculate_value()
+        b = self.children[1].calculate_value()
+        self.current_value = not a or b
+        return self.current_value
+
     def nnf(self):
         super().nnf()
 
@@ -184,6 +195,12 @@ class ImplicationOperator(Operator):
 
 
 class BiConditionalOperator(Operator):
+    def calculate_value(self):
+        a = self.children[0].calculate_value()
+        b = self.children[1].calculate_value()
+        self.current_value = (a and b) or (not a and not b)
+        return self.current_value
+
     def nnf(self):
         super().nnf()
 
@@ -194,6 +211,13 @@ class BiConditionalOperator(Operator):
 
 
 class ITEOperator(Operator):
+    def calculate_value(self):
+        a = self.children[0].calculate_value()
+        b = self.children[1].calculate_value()
+        c = self.children[2].calculate_value()
+        self.current_value = (not a or b) and (a or c)
+        return self.current_value
+
     def nnf(self):
         super().nnf()
 
