@@ -1,6 +1,8 @@
-from Formula import Formula
+from parser import Parser
+from termcolor import colored
+
 
 if __name__ == "__main__":
-    # f = Formula("not a and not (x or c)")
-    # print(f)
-    # print(f.nnf())
+    f = Parser().parse("not A")
+
+    f.print_truth_table()

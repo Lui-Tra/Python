@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 class Token(ABC):
     def __init__(self):
-        self.current_value = None
+        self.value = None
 
     @abstractmethod
     def nnf(self):

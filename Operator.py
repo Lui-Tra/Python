@@ -4,6 +4,7 @@ from Token import Token
 from Variable import Variable
 from constants import operators
 
+
 def get_operator(operator_name, children):
     return {
         operators["not"]: NotOperator,
@@ -78,8 +79,8 @@ class AndOrOperator(Operator, ABC):
 
 class NotOperator(Operator):
     def calculate_value(self):
-        self.current_value = not self.children[0].calculate_value()
-        return self.current_value
+        self.value = not self.children[0].calculate_value()
+        return self.value
 
     def nnf(self):
         super().nnf()
@@ -108,11 +109,11 @@ class NotOperator(Operator):
 
 class AndOperator(AndOrOperator):
     def calculate_value(self):
-        self.current_value = True
+        self.value = True
         for c in self.children:
             if not c.calculate_value():
-                self.current_value = False
-        return self.current_value
+                self.value = False
+        return self.value
 
     def nnf(self):
         super().basic_simplify(AndOperator, OrOperator)
@@ -133,11 +134,11 @@ class AndOperator(AndOrOperator):
 
 class OrOperator(AndOrOperator):
     def calculate_value(self):
-        self.current_value = False
+        self.value = False
         for c in self.children:
             if c.calculate_value():
-                self.current_value = True
-        return self.current_value
+                self.value = True
+        return self.value
 
     def nnf(self):
         super().basic_simplify(OrOperator, AndOperator)
@@ -160,8 +161,8 @@ class XorOperator(Operator):
     def calculate_value(self):
         a = self.children[0].calculate_value()
         b = self.children[1].calculate_value()
-        self.current_value = (a and not b) or (not a and b)
-        return self.current_value
+        self.value = (a and not b) or (not a and b)
+        return self.value
 
     def nnf(self):
         super().nnf()
@@ -179,8 +180,8 @@ class ImplicationOperator(Operator):
     def calculate_value(self):
         a = self.children[0].calculate_value()
         b = self.children[1].calculate_value()
-        self.current_value = not a or b
-        return self.current_value
+        self.value = not a or b
+        return self.value
 
     def nnf(self):
         super().nnf()
@@ -198,8 +199,8 @@ class BiConditionalOperator(Operator):
     def calculate_value(self):
         a = self.children[0].calculate_value()
         b = self.children[1].calculate_value()
-        self.current_value = (a and b) or (not a and not b)
-        return self.current_value
+        self.value = (a and b) or (not a and not b)
+        return self.value
 
     def nnf(self):
         super().nnf()
@@ -215,8 +216,8 @@ class ITEOperator(Operator):
         a = self.children[0].calculate_value()
         b = self.children[1].calculate_value()
         c = self.children[2].calculate_value()
-        self.current_value = (not a or b) and (a or c)
-        return self.current_value
+        self.value = (not a or b) and (a or c)
+        return self.value
 
     def nnf(self):
         super().nnf()
@@ -228,7 +229,6 @@ class ITEOperator(Operator):
 
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
-
 
 # TODO: dnf, knf
 # TODO: nur nand oder nor

@@ -8,8 +8,7 @@ class Variable(Token):
         self.value = value
 
     def calculate_value(self):
-        self.current_value = self.value
-        return self.current_value
+        return self.value
 
     def nnf(self):
         return self
