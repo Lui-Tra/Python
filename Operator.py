@@ -31,14 +31,6 @@ class Operator(Token, ABC):
     def multiple_traverse(self, operator):
         return "(" + (" " + operator + " ").join(map(str, self.children)) + ")"
 
-    def nnf(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].nnf()
-
-        return self
-
-
-class AndOrOperator(Operator, ABC):
     def get_truth_table_entry(self):
         res = "("
         for child in self.children:
@@ -48,6 +40,14 @@ class AndOrOperator(Operator, ABC):
         res += ")"
         return res
 
+    def nnf(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].nnf()
+
+        return self
+
+
+class AndOrOperator(Operator, ABC):
     def basic_simplify(self, my_class, other_class):
         super().nnf()
 
@@ -206,15 +206,6 @@ class XorOperator(Operator):
         res += ")"
         return res
 
-    def get_truth_table_entry(self):
-        res = "("
-        for child in self.children:
-            res += child.get_truth_table_entry()
-            res += center(self.value, 3)
-        res = res[:-3]
-        res += ")"
-        return res
-
     def nnf(self):
         super().nnf()
 
@@ -233,6 +224,15 @@ class ImplicationOperator(Operator):
         b = self.children[1].calculate_value()
         self.value = not a or b
         return self.value
+
+    def get_truth_table_header(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += center(operators["implication"], 3)
+        res = res[:-3]
+        res += ")"
+        return res
 
     def nnf(self):
         super().nnf()
@@ -253,6 +253,15 @@ class BiConditionalOperator(Operator):
         self.value = (a and b) or (not a and not b)
         return self.value
 
+    def get_truth_table_header(self):
+        res = "("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += center(operators["bi-conditional"], 3)
+        res = res[:-3]
+        res += ")"
+        return res
+
     def nnf(self):
         super().nnf()
 
@@ -269,6 +278,24 @@ class ITEOperator(Operator):
         c = self.children[2].calculate_value()
         self.value = (not a or b) and (a or c)
         return self.value
+
+    def get_truth_table_header(self):
+        res = "ITE("
+        for child in self.children:
+            res += child.get_truth_table_header()
+            res += ", "
+        res = res[:-2]
+        res += ")"
+        return res
+
+    def get_truth_table_entry(self):
+        res = center(self.value, 3) + "("
+        for child in self.children:
+            res += child.get_truth_table_entry()
+            res += ", "
+        res = res[:-2]
+        res += ")"
+        return res
 
     def nnf(self):
         super().nnf()
