@@ -166,10 +166,12 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "ITE(a, value, ITE(de, a, d))"
+    formula = "a or b"
 
     print(formula)
 
     root = parse(formula)
 
-    print(type(root), root.print_truth_table())
+    print(root)
+    print(root.dnf())
+    print(root.knf())
