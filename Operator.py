@@ -18,6 +18,7 @@ def get_operator(operator_name, children):
 
 class Operator(Token, ABC):
     def __init__(self, *children):
+        super().__init__()
         if isinstance(children[0], list):
             self.children = children[0]
         else:
@@ -36,7 +37,7 @@ class Operator(Token, ABC):
         return self
 
 
-class AndOrOperator(Operator):
+class AndOrOperator(Operator, ABC):
     def basic_simplify(self, my_class, other_class):
         super().nnf()
 
@@ -76,6 +77,10 @@ class AndOrOperator(Operator):
 
 
 class NotOperator(Operator):
+    def calculate_value(self):
+        self.current_value = not self.children[0].calculate_value()
+        return self.current_value
+
     def nnf(self):
         super().nnf()
 
@@ -102,6 +107,12 @@ class NotOperator(Operator):
 
 
 class AndOperator(AndOrOperator):
+    def calculate_value(self):
+        self.current_value = True
+        for c in self.children:
+            if not c.calculate_value():
+                self.current_value = False
+
     def nnf(self):
         super().basic_simplify(AndOperator, OrOperator)
 
@@ -120,6 +131,12 @@ class AndOperator(AndOrOperator):
 
 
 class OrOperator(AndOrOperator):
+    def calculate_value(self):
+        self.current_value = False
+        for c in self.children:
+            if c.calculate_value():
+                self.current_value = True
+
     def nnf(self):
         super().basic_simplify(OrOperator, AndOperator)
 
@@ -138,6 +155,9 @@ class OrOperator(AndOrOperator):
 
 
 class XorOperator(Operator):
+    def calculate_value(self):
+
+
     def nnf(self):
         super().nnf()
 
@@ -184,3 +204,10 @@ class ITEOperator(Operator):
 
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
+
+
+# TODO: dnf, knf
+# TODO: nur nand oder nor
+# TODO: truth table
+# TODO: kv diagramm (pygame oder tkinter?)
+# TODO: gueltigkeit, wahr oder falsch

@@ -1,16 +1,6 @@
-from parser import parse
+from Formula import Formula
 
-root = parse("ITE(A, B, C)")
-operators = {
-    "not": "¬",
-    "and": "∧",
-    "or": "∨",
-    "xor": "⊕",
-    "implication": "→",
-    "bi-conditional": "↔",
-    "ite": "ITE"
-}
 if __name__ == "__main__":
-    print(root)
-    root = root.nnf()
-    print(root)
+    # f = Formula("not a and not (x or c)")
+    # print(f)
+    # print(f.nnf())
