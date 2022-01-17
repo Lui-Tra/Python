@@ -1,4 +1,3 @@
-import kv_generator
 import kv
 from Operator import NotOperator, AndOperator, OrOperator
 from constants import center

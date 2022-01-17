@@ -22,5 +22,9 @@ class Token(ABC):
     def nnf(self):
         pass
 
+    @abstractmethod
+    def simplify(self):
+        pass
+
     def __repr__(self):
         return str(self)
