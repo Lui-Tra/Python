@@ -4,7 +4,7 @@ from Formula import Formula
 from constants import operators
 from constants import prefix_operators
 from Operator import get_operator
-from Variable import Variable
+from Variable import Variable, TRUE, FALSE
 
 
 class Parser:
@@ -15,7 +15,9 @@ class Parser:
     def __create_variable__(self, name):
         if name not in self.variables:
             if name == "false":
-                self.variables[name] = Variable("false", False)
+                self.variables[name] = Variable.FALSE
+            elif name == "true":
+                self.variables[name] = Variable.TRUE
             else:
                 self.variables[name] = Variable(name)
         return self.variables[name]
@@ -171,7 +173,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "((a xor b) or (c and d)) and not (c and d and not a and not b)"
+    formula = "((a xor b) or (c and d)) and not (c and d and not a and not b) or true"
 
     root = parse(formula)
     root.print_truth_table()

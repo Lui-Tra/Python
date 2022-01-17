@@ -221,6 +221,14 @@ class XorOperator(Operator):
             OrOperator(list(map(NotOperator, self.children)))
         ]).nnf()
 
+    def simplify(self):
+        super().simplify()
+
+        return AndOperator([
+            OrOperator(self.children),
+            OrOperator(list(map(NotOperator, self.children)))
+        ])
+
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
 
@@ -242,6 +250,14 @@ class ImplicationOperator(Operator):
         return res
 
     def nnf(self):
+        super().nnf()
+
+        return OrOperator(
+            NotOperator(self.children[0]),
+            self.children[1]
+        ).nnf()
+
+    def simplify(self):
         super().nnf()
 
         return OrOperator(
@@ -271,6 +287,11 @@ class BiConditionalOperator(Operator):
         return res
 
     def nnf(self):
+        super().nnf()
+
+        return NotOperator(XorOperator(self.children)).nnf()
+
+    def simplify(self):
         super().nnf()
 
         return NotOperator(XorOperator(self.children)).nnf()
@@ -306,6 +327,14 @@ class ITEOperator(Operator):
         return res
 
     def nnf(self):
+        super().nnf()
+
+        return AndOperator(
+            ImplicationOperator(self.children[0], self.children[1]),
+            ImplicationOperator(NotOperator(self.children[0]), self.children[2])
+        ).nnf()
+
+    def simplify(self):
         super().nnf()
 
         return AndOperator(
