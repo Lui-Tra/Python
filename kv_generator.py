@@ -23,7 +23,7 @@ def mirror_kv_v(kv, new_var):
         for vars in line:
             new_vars = dict(vars)
             new_vars[new_var] = 1
-            new_line.append(vars | {new_var:True})
+            new_line.append(vars | {new_var: True})
         res.append(new_line)
     return res
 
@@ -41,6 +41,7 @@ def __generate_kv__(variables, current_variables):
             return mirror_kv_h(prev_kv, new_var)
         else:
             return mirror_kv_v(prev_kv, new_var)
+
 
 def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_width=3, side_distance=100):
     pygame.init()
@@ -67,9 +68,11 @@ def draw_text(screen, pos, text):
 
 def draw_centered_text(screen, pos, text):
     text, rect = pygame.freetype.SysFont("Segoe UI", 20).render(text, (0, 0, 0))
-    screen.blit(text, (pos[0]-rect.width//2, pos[1]))
+    screen.blit(text, (pos[0] - rect.width // 2, pos[1]))
+
 
 first_time = True
+
 
 def render_names(variables, screen, scale=1, block_width=50, border_width=3, side_distance=150):
     global first_time
@@ -88,17 +91,17 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
         if n % 2 == 0:
             line_length = (2 ** math.ceil((n + 1) / 2))
             indent = math.ceil(line_length / 2) * (block_width + border_width)
-            if (line_length == num_columns):
+            if line_length == num_columns:
                 line_length //= 2
             num_lines = math.ceil((num_columns // line_length) / 2)
 
             fprint("ll:", line_length)
             fprint("nl:", num_lines)
 
-            y = scale * (side_distance - 15*(n+1))
+            y = scale * (side_distance - 15 * (n + 1))
             for i in range(num_lines):
 
-                start_x = scale * (indent + side_distance + (2*line_length*i) * (block_width + border_width))
+                start_x = scale * (indent + side_distance + (2 * line_length * i) * (block_width + border_width))
                 end_x = start_x + line_length * (block_width + border_width)
 
                 if n == 0:
@@ -110,16 +113,19 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
                 else:
                     color = "orange"
 
-                pygame.draw.line(screen, color,
-                             (start_x, y),
-                             (end_x, y)
-                            )
+                pygame.draw.line(
+                    screen,
+                    color,
+                    (start_x, y),
+                    (end_x, y),
+                    3
+                )
 
-                draw_centered_text(screen, (start_x+(end_x-start_x)//2, y-15), var)
+                draw_centered_text(screen, (start_x + (end_x - start_x) // 2, y - 15), var)
         else:
-            line_length = (2 ** math.floor((n+1) / 2))
+            line_length = (2 ** math.floor((n + 1) / 2))
             indent = math.ceil(line_length / 2) * (block_width + border_width)
-            if (line_length == num_rows):
+            if line_length == num_rows:
                 line_length //= 2
             num_lines = (num_rows // line_length) // 2
 
@@ -128,8 +134,7 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
 
             y = scale * (side_distance - 15 * (n + 1))
             for i in range(num_lines):
-
-                start_x = scale * (indent + side_distance + (2*line_length*i) * (block_width + border_width))
+                start_x = scale * (indent + side_distance + (2 * line_length * i) * (block_width + border_width))
                 end_x = start_x + line_length * (block_width + border_width)
 
                 if n == 0:
@@ -141,10 +146,13 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
                 else:
                     color = "orange"
 
-                pygame.draw.line(screen, color,
-                                 (y, start_x),
-                                 (y, end_x)
-                                 )
+                pygame.draw.line(
+                    screen,
+                    color,
+                    (y, start_x),
+                    (y, end_x),
+                    3
+                )
 
                 draw_text(screen, (y - 15, start_x + (end_x - start_x) // 2), var)
 
@@ -171,6 +179,7 @@ def render_cells(diagramm, screen, scale=1, block_width=50, border_width=3, side
                               scale * block_width,
                               scale * block_width]
                              )
+
 
 def generate_kv(variables):
     return __generate_kv__(variables, variables)

@@ -7,7 +7,9 @@ operators = {
     "xor": "⊕",
     "implication": "→",
     "bi-conditional": "↔",
-    "ite": "ITE"
+    "ite": "ITE",
+    "nand": "NAND",
+    "nor": "NOR",
 }
 
 prefix_operators = ("ITE", )

@@ -18,6 +18,24 @@ class Token(ABC):
     def get_truth_table_entry(self, depth):
         pass
 
+    def associative_law(self):
+        return self
+
+    def absorption(self):
+        return self
+
+    def idempotence(self):
+        return self
+
+    def trivial_simplification(self):
+        return self
+
+    def dominance(self):
+        return self
+
+    def identity(self):
+        return self
+
     @abstractmethod
     def nnf(self):
         pass
