@@ -171,8 +171,9 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "ITE(A or B, C, D)"
+    formula = "((a xor b) or (c and d)) and not (c and d and not a and not b)"
 
     root = parse(formula)
-    root.nnf()
     root.print_truth_table()
+    root = root.knf()
+    root.kv()
