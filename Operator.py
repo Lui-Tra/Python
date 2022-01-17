@@ -316,8 +316,6 @@ class ITEOperator(Operator):
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
 
-# TODO: dnf, knf
 # TODO: nur nand oder nor
-# TODO: truth table
 # TODO: kv diagramm (pygame oder tkinter?)
 # TODO: gueltigkeit, wahr oder falsch

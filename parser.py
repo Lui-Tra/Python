@@ -175,5 +175,5 @@ if __name__ == "__main__":
 
     root = parse(formula)
     root.print_truth_table()
-    root = root.knf()
+    root = root.canonical_cnf()
     root.kv()

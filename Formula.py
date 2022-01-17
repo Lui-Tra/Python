@@ -4,6 +4,7 @@ from Operator import NotOperator, AndOperator, OrOperator
 from constants import center
 from kv_generator import generate_kv
 
+
 class Formula:
     def __init__(self, root=None, variables=None):
         if variables is None:
@@ -65,7 +66,7 @@ class Formula:
                 variables[index].value = True
             yield self.get_values(), self.root.calculate_value()
 
-    def dnf(self):
+    def canonical_dnf(self):
         truth_table = self.get_truth_table()
         terms = [term for term, val in truth_table if val]
         new_terms = []
@@ -83,7 +84,7 @@ class Formula:
             self.root = OrOperator(new_terms)
         return self
 
-    def knf(self):
+    def canonical_cnf(self):
         truth_table = self.get_truth_table()
         terms = [term for term, val in truth_table if not val]
         new_terms = []
@@ -107,7 +108,7 @@ class Formula:
     def set_values(self, dict):
         for key, value in dict.items():
             self.variables[key].value = value
-            print({k:v.value for k, v in self.variables.items()})
+            print({k: v.value for k, v in self.variables.items()})
 
     def kv(self):
         values = generate_kv(list(self.variables.keys()))
@@ -122,11 +123,6 @@ class Formula:
             matrix.append(new_row)
         print("matrix:")
         kv.show_kv_diagramm(matrix)
-
-
-
-
-
 
     def __str__(self):
         return str(self.root)
