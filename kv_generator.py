@@ -64,6 +64,12 @@ def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_widt
 def draw_text(screen, pos, text):
     pygame.freetype.SysFont("Segoe UI", 20).render_to(screen, pos, text, (0, 0, 0))
 
+
+def draw_centered_text(screen, pos, text):
+    text, rect = pygame.freetype.SysFont("Segoe UI", 20).render(text, (0, 0, 0))
+    screen.blit(text, (pos[0]-rect.width//2, pos[1]))
+
+
 def render_names(variables, screen, scale=1, block_width=50, border_width=3, side_distance=150):
     num_columns = (2 ** math.ceil(len(variables) / 2))
     num_rows = (2 ** math.floor(len(variables) / 2))
@@ -94,7 +100,7 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
                              (end_x, y)
                             )
 
-                draw_text(screen, (start_x, y-15), var)
+                draw_centered_text(screen, (start_x+(end_x-start_x)//2, y-15), var)
         else:
             #seite
             pass
