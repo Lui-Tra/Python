@@ -20,6 +20,9 @@ class Variable(Token):
     def nnf(self):
         return self
 
+    def simplify(self):
+        return self
+
     def __str__(self):
         return self.name
 
@@ -30,3 +33,7 @@ class Variable(Token):
 
     def clone(self):
         return Variable(self.name, self.value)
+
+
+TRUE = Variable("true", True)
+FALSE = Variable("false", False)
