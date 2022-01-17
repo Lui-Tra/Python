@@ -1,7 +1,7 @@
 from abc import ABC
 
 from Token import Token
-from Variable import Variable
+from Variable import Variable, FALSE, TRUE
 from constants import operators, center
 
 
@@ -96,13 +96,6 @@ class AndOrOperator(Operator, ABC):
     def simplify(self):
         super().simplify()
 
-        # Idempotenz
-        new_children = []
-        for child in self.children:
-            if child not in new_children:
-                new_children.append(child)
-        self.children = new_children
-
         # Assoziativität
         add_new = []
         rem = []
@@ -127,7 +120,40 @@ class AndOrOperator(Operator, ABC):
         for it in rem:
             self.children.remove(it)
 
-        return self
+        # Idempotenz
+        new_children = []
+        for child in self.children:
+            if child not in new_children:
+                new_children.append(child)
+        self.children = new_children
+
+        # Ausmultiplizieren
+        if isinstance(self, OrOperator):
+            inner_operator = OrOperator
+            outer_operator = AndOperator
+        else:
+            inner_operator = AndOperator
+            outer_operator = OrOperator
+        while len(self.children) > 1:
+            first = self.children.pop()
+            if isinstance(first, Variable):
+                first = [first]
+            else:
+                first = first.children
+
+            second = self.children.pop()
+            if isinstance(second, Variable):
+                second = [second]
+            else:
+                second = second.children
+
+            result = []
+            for c1 in first:
+                for c2 in second:
+                    result.append(inner_operator(c1, c2))
+            self.children.append(outer_operator(result))
+
+        return self.children[0]
 
 
 class NotOperator(Operator):
@@ -156,6 +182,27 @@ class NotOperator(Operator):
             return Variable("true", True)
 
         return super().nnf()
+
+    def simplify(self):
+        super().simplify()
+
+        # Doppelnegation
+        if isinstance(self.children[0], NotOperator):
+            return self.children[0].children[0]
+
+        # deMorgan
+        elif isinstance(self.children[0], AndOperator):
+            return OrOperator(list(map(NotOperator, self.children[0].children))).simplify()
+        elif isinstance(self.children[0], OrOperator):
+            return AndOperator(list(map(NotOperator, self.children[0].children))).simplify()
+
+        # Negation
+        elif self.children[0] == TRUE:
+            return FALSE
+        elif self.children[0] == FALSE:
+            return TRUE
+
+        return self
 
     def __str__(self):
         return self.unary_traverse(operators["not"])
@@ -197,6 +244,27 @@ class AndOperator(AndOrOperator):
 
         return super().nnf()
 
+    def simplify(self):
+        super().simplify()
+
+        # Triviale Kontradiktion
+        for child in self.children:
+            if NotOperator(child) in self.children:
+                return FALSE
+
+        # Dominanz
+        if FALSE in self.children:
+            return FALSE
+
+        # Identität
+        while TRUE in self.children:
+            self.children.remove(TRUE)
+
+        if len(self.children) == 1:
+            return self.children[0]
+
+        return self
+
     def __str__(self):
         return self.multiple_traverse(operators["and"])
 
@@ -231,6 +299,27 @@ class OrOperator(AndOrOperator):
             return self.children[0].nnf()
 
         return super().nnf()
+
+    def simplify(self):
+        super().simplify()
+
+        # Triviale Tautologie
+        for child in self.children:
+            if NotOperator(child) in self.children:
+                return TRUE
+
+        # Dominanz
+        if TRUE in self.children:
+            return TRUE
+
+        # Identität
+        while FALSE in self.children:
+            self.children.remove(FALSE)
+
+        if len(self.children) == 1:
+            return self.children[0]
+
+        return self
 
     def __str__(self):
         return self.multiple_traverse(operators["or"])
