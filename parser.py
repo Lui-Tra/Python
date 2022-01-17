@@ -174,7 +174,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "a xor b xor c xor d xor e xor f"
+    formula = "a xor b xor c xor d xor e xor f xor x"
 
     root = parse(formula)
     root.kv()

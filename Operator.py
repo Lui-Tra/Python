@@ -14,6 +14,8 @@ def get_operator(operator_name, children):
         operators["implication"]: ImplicationOperator,
         operators["bi-conditional"]: BiConditionalOperator,
         operators["ite"]: ITEOperator,
+        operators["nand"]: NandOperator,
+        operators["nor"]: NorOperator,
     }[operator_name](children)
 
 
@@ -56,44 +58,10 @@ class Operator(Token, ABC):
 
 
 class AndOrOperator(Operator, ABC):
-    def basic_simplify(self, my_class, other_class):
-        super().nnf()
-
-        to_remove = []
+    def associative_law(self):
         for i in range(len(self.children)):
-            if isinstance(self.children[i], Operator):
-                if isinstance(self.children[i], other_class):
-                    for var in self.children:
-                        if isinstance(var, Variable) \
-                                and (isinstance(self.children[i], Variable) or var in self.children[i].children):
-                            self.children[i] = var
-                elif isinstance(self.children[i], my_class):
-                    self.children.extend(self.children[i].children)
-                    to_remove.append(self.children[i])
+            self.children[i] = self.children[i].associative_law()
 
-        for t in to_remove:
-            self.children.remove(t)
-
-        for c in self.children:
-            while self.children.count(c) > 1:
-                self.children.remove(c)
-
-        to_remove = []
-        for child in self.children:
-            if NotOperator(child) in self.children:
-                to_remove.append(child)
-
-        for t in to_remove:
-            self.children.remove(t)
-            self.children.remove(NotOperator(t))
-            if my_class == AndOperator:
-                self.children.append(Variable("false", False))
-            else:
-                self.children.append(Variable("true", True))
-
-        return super().nnf()
-
-    def assoziativitaet(self):
         add_new = []
         rem = []
         for child in self.children:
@@ -104,9 +72,13 @@ class AndOrOperator(Operator, ABC):
         for it in rem:
             self.children.remove(it)
         self.children.extend(add_new)
+
         return self
 
     def absorption(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].absorption()
+
         rem = []
         for i in range(len(self.children)):
             if isinstance(self.children[i], Operator) and \
@@ -118,9 +90,13 @@ class AndOrOperator(Operator, ABC):
         for it in rem:
             if it in self.children:
                 self.children.remove(it)
+
         return self
 
-    def idempotenz(self):
+    def idempotence(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].idempotence()
+
         new_children = []
         for child in self.children:
             if child not in new_children:
@@ -132,11 +108,49 @@ class AndOrOperator(Operator, ABC):
 
         return self
 
+    def trivial_simplification(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].trivial_simplification()
+
+        for child in self.children:
+            if NotOperator(child) in self.children:
+                if isinstance(self, OrOperator):
+                    return TRUE
+                else:
+                    return FALSE
+
+        return self
+
+    def dominance(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].dominance()
+
+        if isinstance(self, OrOperator) and TRUE in self.children:
+            return TRUE
+        elif isinstance(self, AndOperator) and FALSE in self.children:
+            return FALSE
+
+        return self
+
+    def identity(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].identity()
+
+        if isinstance(self, OrOperator):
+            while FALSE in self.children and len(self.children) > 1:
+                self.children.remove(FALSE)
+        else:
+            if isinstance(self, AndOperator):
+                while TRUE in self.children and len(self.children) > 1:
+                    self.children.remove(TRUE)
+
+        return self
+
     def simplify(self):
         super().simplify()
 
-        self.assoziativitaet()
-        self.idempotenz()
+        self.associative_law()
+        self.idempotence()
         self.absorption()
 
         return self
@@ -508,6 +522,37 @@ class ITEOperator(Operator):
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
 
+
+class NorOperator(Operator):
+    def calculate_value(self):
+        raise NotImplemented("Fehlt noch")
+
+    def get_truth_table_header(self, depth):
+        raise NotImplemented("Fehlt noch")
+
+    def simplify(self):
+        super().simplify()
+
+        return NotOperator(OrOperator(self.children))
+
+    def __str__(self):
+        return self.multiple_traverse(operators["nor"])
+
+
+class NandOperator(Operator):
+    def calculate_value(self):
+        raise NotImplemented("Fehlt noch")
+
+    def get_truth_table_header(self, depth):
+        raise NotImplemented("Fehlt noch")
+
+    def simplify(self):
+        super().simplify()
+
+        return NotOperator(AndOperator(self.children))
+
+    def __str__(self):
+        return self.multiple_traverse(operators["nand"])
+
+
 # TODO: nur nand oder nor
-# TODO: kv diagramm (pygame oder tkinter?)
-# TODO: gueltigkeit, wahr oder falsch
