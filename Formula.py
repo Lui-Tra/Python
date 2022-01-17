@@ -47,6 +47,10 @@ class Formula:
         self.root = self.root.nnf()
         return self
 
+    def simplify(self):
+        self.root = self.root.simplify()
+        return self
+
     def get_values(self):
         return {name: var.value for name, var in self.variables.items()}
 

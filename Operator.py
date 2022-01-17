@@ -47,6 +47,10 @@ class Operator(Token, ABC):
 
         return self
 
+    def simplify(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].simplify()
+
     def clone(self):
         return self.__class__([child.clone for child in self.children])
 
@@ -88,6 +92,42 @@ class AndOrOperator(Operator, ABC):
                 self.children.append(Variable("true", True))
 
         return super().nnf()
+
+    def simplify(self):
+        super().simplify()
+
+        # Idempotenz
+        new_children = []
+        for child in self.children:
+            if child not in new_children:
+                new_children.append(child)
+        self.children = new_children
+
+        # Assoziativität
+        add_new = []
+        rem = []
+        for child in self.children:
+            if isinstance(self, AndOperator) and isinstance(child, AndOperator) \
+                    or isinstance(self, OrOperator) and isinstance(child, OrOperator):
+                add_new.extend(child.children)
+                rem.append(child)
+        for it in rem:
+            self.children.remove(it)
+        self.children.extend(add_new)
+
+        # Absorption
+        rem = []
+        for i in range(len(self.children)):
+            if isinstance(self.children[i], Operator) and \
+                    isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
+                    isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator):
+                for var in self.children:
+                    if isinstance(var, Variable) and var in self.children[i].children:
+                        rem.append(self.children[i])
+        for it in rem:
+            self.children.remove(it)
+
+        return self
 
 
 class NotOperator(Operator):
