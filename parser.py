@@ -5,6 +5,7 @@ from constants import operators
 from constants import prefix_operators
 from Operator import get_operator
 from Variable import Variable, TRUE, FALSE
+import Variable as Variables
 
 
 class Parser:
@@ -15,9 +16,9 @@ class Parser:
     def __create_variable__(self, name):
         if name not in self.variables:
             if name == "false":
-                self.variables[name] = Variable.FALSE
+                self.variables[name] = Variables.FALSE
             elif name == "true":
-                self.variables[name] = Variable.TRUE
+                self.variables[name] = Variables.TRUE
             else:
                 self.variables[name] = Variable(name)
         return self.variables[name]
@@ -173,9 +174,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "((a xor b) or (c and d)) and not (c and d and not a and not b) or true"
+    formula = "a xor b xor c xor d xor e xor f xor g xor h xor i"
 
     root = parse(formula)
-    root.print_truth_table()
-    root = root.canonical_cnf()
     root.kv()

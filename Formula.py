@@ -1,7 +1,8 @@
 import kv
+import kv_generator
 from Operator import NotOperator, AndOperator, OrOperator
 from constants import center
-from kv_generator import generate_kv
+from kv_generator import generate_kv, render_kv_diagramm
 
 
 class Formula:
@@ -111,11 +112,9 @@ class Formula:
     def set_values(self, dict):
         for key, value in dict.items():
             self.variables[key].value = value
-            print({k: v.value for k, v in self.variables.items()})
 
     def kv(self):
         values = generate_kv(list(self.variables.keys()))
-        print(values)
         matrix = []
         for row in values:
             new_row = []
@@ -124,8 +123,7 @@ class Formula:
                 val = self.root.calculate_value()
                 new_row.append(val)
             matrix.append(new_row)
-        print("matrix:")
-        kv.show_kv_diagramm(matrix)
+        kv_generator.render_kv_diagramm(matrix, list(self.variables.keys()))
 
     def __str__(self):
         return str(self.root)
