@@ -78,22 +78,12 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
     num_rows = (2 ** math.floor(len(variables) / 2))
 
     for n, var in enumerate(variables):
-
-        def fprint(*args, **kwargs):
-            if first_time:
-                print(*args, **kwargs)
-
-        fprint(n, var)
-
         if n % 2 == 0:
             line_length = (2 ** math.ceil((n + 1) / 2))
             indent = math.ceil(line_length / 2) * (block_width + border_width)
             if (line_length == num_columns):
                 line_length //= 2
             num_lines = math.ceil((num_columns // line_length) / 2)
-
-            fprint("ll:", line_length)
-            fprint("nl:", num_lines)
 
             y = scale * (side_distance - 15*(n+1))
             for i in range(num_lines):
@@ -123,33 +113,27 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
                 line_length //= 2
             num_lines = (num_rows // line_length) // 2
 
-            fprint("ll:", line_length)
-            fprint("nl:", num_lines)
-
-            y = scale * (side_distance - 15 * (n + 1))
+            x = scale * (side_distance - 15 * (n + 1))
             for i in range(num_lines):
 
-                start_x = scale * (indent + side_distance + (2*line_length*i) * (block_width + border_width))
-                end_x = start_x + line_length * (block_width + border_width)
+                start_y = scale * (indent + side_distance + (2*line_length*i) * (block_width + border_width))
+                end_y = start_y + line_length * (block_width + border_width)
 
-                if n == 0:
+                if n == 1:
                     color = "blue"
-                elif n == 2:
+                elif n == 3:
                     color = "green"
-                elif n == 4:
+                elif n == 5:
                     color = "red"
                 else:
                     color = "orange"
 
                 pygame.draw.line(screen, color,
-                                 (y, start_x),
-                                 (y, end_x)
+                                 (x, start_y),
+                                 (x, end_y)
                                  )
 
-                draw_text(screen, (y - 15, start_x + (end_x - start_x) // 2), var)
-
-            pass
-    first_time = False
+                draw_text(screen, (x - 15, start_y + (end_y - start_y) // 2), var)
 
 
 def render_cells(diagramm, screen, scale=1, block_width=50, border_width=3, side_distance=150):
