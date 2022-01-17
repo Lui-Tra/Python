@@ -93,10 +93,7 @@ class AndOrOperator(Operator, ABC):
 
         return super().nnf()
 
-    def simplify(self):
-        super().simplify()
-
-        # Assoziativität
+    def assoziativitaet(self):
         add_new = []
         rem = []
         for child in self.children:
@@ -107,8 +104,9 @@ class AndOrOperator(Operator, ABC):
         for it in rem:
             self.children.remove(it)
         self.children.extend(add_new)
+        return self
 
-        # Absorption
+    def absorption(self):
         rem = []
         for i in range(len(self.children)):
             if isinstance(self.children[i], Operator) and \
@@ -119,13 +117,26 @@ class AndOrOperator(Operator, ABC):
                         rem.append(self.children[i])
         for it in rem:
             self.children.remove(it)
+        return self
 
-        # Idempotenz
+    def idempotenz(self):
         new_children = []
         for child in self.children:
             if child not in new_children:
                 new_children.append(child)
         self.children = new_children
+
+        if len(self.children) == 1:
+            return self.children[0]
+
+        return self
+
+    def simplify(self):
+        super().simplify()
+
+        self.assoziativitaet()
+        self.absorption()
+        self.idempotenz()
 
         # Ausmultiplizieren
         if isinstance(self, OrOperator):
@@ -150,8 +161,8 @@ class AndOrOperator(Operator, ABC):
             result = []
             for c1 in first:
                 for c2 in second:
-                    result.append(inner_operator(c1, c2))
-            self.children.append(outer_operator(result))
+                    result.append(inner_operator(c1, c2).assoziativitaet().idempotenz())
+            self.children.append(outer_operator(result).absorption())
 
         return self.children[0]
 
