@@ -113,10 +113,11 @@ class AndOrOperator(Operator, ABC):
                     isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
                     isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator):
                 for var in self.children:
-                    if isinstance(var, Variable) and var in self.children[i].children:
+                    if var in self.children[i].children:
                         rem.append(self.children[i])
         for it in rem:
-            self.children.remove(it)
+            if it in self.children:
+                self.children.remove(it)
         return self
 
     def idempotenz(self):
@@ -135,36 +136,10 @@ class AndOrOperator(Operator, ABC):
         super().simplify()
 
         self.assoziativitaet()
-        self.absorption()
         self.idempotenz()
+        self.absorption()
 
-        # Ausmultiplizieren
-        if isinstance(self, OrOperator):
-            inner_operator = OrOperator
-            outer_operator = AndOperator
-        else:
-            inner_operator = AndOperator
-            outer_operator = OrOperator
-        while len(self.children) > 1:
-            first = self.children.pop()
-            if isinstance(first, Variable):
-                first = [first]
-            else:
-                first = first.children
-
-            second = self.children.pop()
-            if isinstance(second, Variable):
-                second = [second]
-            else:
-                second = second.children
-
-            result = []
-            for c1 in first:
-                for c2 in second:
-                    result.append(inner_operator(c1, c2).assoziativitaet().idempotenz())
-            self.children.append(outer_operator(result).absorption())
-
-        return self.children[0]
+        return self
 
 
 class NotOperator(Operator):
@@ -255,9 +230,7 @@ class AndOperator(AndOrOperator):
 
         return super().nnf()
 
-    def simplify(self):
-        super().simplify()
-
+    def simplify2(self):
         # Triviale Kontradiktion
         for child in self.children:
             if NotOperator(child) in self.children:
@@ -270,6 +243,32 @@ class AndOperator(AndOrOperator):
         # Identität
         while TRUE in self.children:
             self.children.remove(TRUE)
+
+        if len(self.children) == 0:
+            return TRUE
+
+        return self
+
+    def simplify(self):
+        super().simplify()
+
+        res = self.simplify2()
+        if res != self:
+            return res
+
+        rem = []
+        for child in self.children:
+            if not isinstance(child, OrOperator):
+                rem.append(child)
+                for orOp in self.children:
+                    if isinstance(orOp, OrOperator):
+                        orOp.children.append(child)
+        for it in rem:
+            self.children.remove(it)
+
+        res = self.simplify2()
+        if res != self:
+            return res
 
         if len(self.children) == 1:
             return self.children[0]
@@ -311,9 +310,7 @@ class OrOperator(AndOrOperator):
 
         return super().nnf()
 
-    def simplify(self):
-        super().simplify()
-
+    def simplify2(self):
         # Triviale Tautologie
         for child in self.children:
             if NotOperator(child) in self.children:
@@ -326,6 +323,32 @@ class OrOperator(AndOrOperator):
         # Identität
         while FALSE in self.children:
             self.children.remove(FALSE)
+
+        if len(self.children) == 0:
+            return FALSE
+
+        return self
+
+    def simplify(self):
+        super().simplify()
+
+        res = self.simplify2()
+        if res != self:
+            return res
+
+        rem = []
+        for child in self.children:
+            if not isinstance(child, AndOperator):
+                rem.append(child)
+                for andOp in self.children:
+                    if isinstance(andOp, AndOperator):
+                        andOp.children.append(child)
+        for it in rem:
+            self.children.remove(it)
+
+        res = self.simplify2()
+        if res != self:
+            return res
 
         if len(self.children) == 1:
             return self.children[0]
