@@ -138,8 +138,7 @@ class AndOrOperator(Operator, ABC):
             if (isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or
                     isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator)):
                 for var in self.children:
-                    if isinstance(var, Variable) and NotOperator(var) in self.children[i].children or \
-                            isinstance(var, NotOperator) and var.children[0] in self.children[i].children:
+                    if isinstance(var, Variable) or isinstance(var, NotOperator):
                         new_children = []
                         for child in self.children[i].children:
                             new_children.append(self.__class__(var, child))
@@ -147,7 +146,8 @@ class AndOrOperator(Operator, ABC):
                         rem.append(var)
 
         for it in rem:
-            self.children.remove(it)
+            if it in self.children:
+                self.children.remove(it)
 
         return self
 
