@@ -45,5 +45,11 @@ class Token(ABC):
     def smart_expand(self):
         return self
 
+    def to_nand(self):
+        return self
+
+    def to_nor(self):
+        pass
+
     def __repr__(self):
         return str(self)
