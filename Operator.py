@@ -259,11 +259,7 @@ class NotOperator(Operator):
 
 class AndOperator(AndOrOperator):
     def calculate_value(self):
-        self.value = True
-        for c in self.children:
-            if not c.calculate_value():
-                self.value = False
-        return self.value
+        return all(c.calculate_value() for c in self.children)
 
     def get_truth_table_header(self, depth):
         res = "("
@@ -286,11 +282,7 @@ class AndOperator(AndOrOperator):
 
 class OrOperator(AndOrOperator):
     def calculate_value(self):
-        self.value = False
-        for c in self.children:
-            if c.calculate_value():
-                self.value = True
-        return self.value
+        return any(c.calculate_value() for c in self.children)
 
     def get_truth_table_header(self, depth):
         res = "("
