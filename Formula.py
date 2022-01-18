@@ -1,5 +1,6 @@
 import kv_generator
 from Operator import NotOperator, AndOperator, OrOperator
+from Variable import Variable
 from constants import center
 from kv_generator import generate_kv, render_kv_diagramm
 
@@ -44,24 +45,26 @@ class Formula:
         print(self.root.get_truth_table_entry(0))
 
     def simplify(self):
-        previous_form = ''
-        while previous_form != str(self):
-            previous_form = str(self)
-            self.root = self.root.replace_with_and_or()
-            self.root = self.root.associative_law()
-            self.root = self.root.absorption()
-            self.root = self.root.idempotence()
-            self.root = self.root.trivial_simplification()
-            self.root = self.root.dominance()
-            self.root = self.root.identity()
-            self.root = self.root.not_operator_simplify()
-            self.root = self.root.smart_expand()
+        very_previous_form = ''
+        while very_previous_form != str(self):
+            very_previous_form = str(self)
+            previous_form = ''
+            while previous_form != str(self):
+                previous_form = str(self)
+                self.root = self.root.replace_with_and_or()
+                self.root = self.root.associative_law()
+                self.root = self.root.absorption()
+                self.root = self.root.idempotence()
+                self.root = self.root.trivial_simplification()
+                self.root = self.root.dominance()
+                self.root = self.root.identity()
+                self.root = self.root.not_operator_simplify()
+                self.root = self.root.smart_expand()
 
-        previous_form = ''
-        while previous_form != str(self):
-            previous_form = str(self)
-            self.root = self.root.smart_exclude()
-
+            previous_form = ''
+            while previous_form != str(self):
+                previous_form = str(self)
+                self.root = self.root.smart_exclude()
         return self
 
     def get_values(self):
@@ -116,6 +119,28 @@ class Formula:
             self.root = new_terms[0]
         else:
             self.root = AndOperator(new_terms)
+        return self
+
+    def simple_cnf(self):
+        self.canonical_cnf()
+        for i in range(len(self.root.children)):
+            for j in range(len(self.root.children)):
+                or1 = self.root.children[i]
+                or2 = self.root.children[j]
+                if i != j:
+                    difference = [value for value in or1.children if value not in or2.children]
+                    simplify = True
+                    for it in difference:
+                        if not (isinstance(it, Variable) and NotOperator(it) in difference or
+                                isinstance(it, NotOperator) and it.children[0] in difference):
+                            simplify = False
+
+                    if simplify:
+                        self.root.children[j] = None
+                        for it in difference:
+                            or1.children.remove(it)
+
+        self.root.children = list(filter(lambda it: it is not None, self.root.children))
         return self
 
     def to_nand(self):

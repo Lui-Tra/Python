@@ -174,7 +174,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "a or b"
-
-    root = parse(formula)
-    root.print_truth_table()
+    form = parse("(a and (not b or not (c and not d)))")
+    print(form)
+    form.simple_cnf()
+    print(form)
