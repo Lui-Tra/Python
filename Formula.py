@@ -112,6 +112,18 @@ class Formula:
             self.root = AndOperator(new_terms)
         return self
 
+    def to_nand(self):
+        self.simplify()
+        self.root = self.root.to_nand()
+
+        return self
+
+    def to_nor(self):
+        self.simplify()
+        self.root = self.root.to_nor()
+
+        return self
+
     def clone(self):
         return Formula(self.root.clone())
 
