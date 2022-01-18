@@ -3,6 +3,7 @@ from abc import ABC
 from Token import Token
 from Variable import FALSE, TRUE, Variable
 from constants import operators, center
+from debugging import indented_print
 
 
 def get_operator(operator_name, children):
@@ -189,10 +190,8 @@ class AndOrOperator(Operator, ABC):
 
     def smart_exclude(self):
         super().smart_exclude()
-
         absolutely_new_children = []
 
-        rem = []
         for i in range(len(self.children)):
             if isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
                     isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator):
@@ -208,15 +207,15 @@ class AndOrOperator(Operator, ABC):
                                 self.children[j].children.remove(it)
                                 absolutely_new_children.append(it)
 
-        for it in rem:
-            if it in self.children:
-                self.children.remove(it)
+        new_children = [child for child in self.children if isinstance(child, Variable) or len(child.children) != 0]
+        new_children_2 = [child if isinstance(child, Variable) or len(child.children) != 1 else child.children[0] for child in new_children]
 
         if len(absolutely_new_children) > 0:
+            indented_print(absolutely_new_children, new_children)
             if isinstance(self, OrOperator):
-                return AndOperator(*absolutely_new_children, OrOperator(self.children))
+                return AndOperator(*absolutely_new_children, OrOperator(new_children_2))
             else:
-                return OrOperator(*absolutely_new_children, AndOperator(self.children))
+                return OrOperator(*absolutely_new_children, AndOperator(new_children_2))
         else:
             return self
 

@@ -1,13 +1,6 @@
 import parser
 from debugging import indented_print
 
-def test2():
-    indented_print("hi")
-
-def test():
-    indented_print("hi")
-    test2()
-
 
 if __name__ == "__main__":
     form = parser.parse("(a and b) or (a and c) or (c and halloFlo)")
@@ -19,4 +12,3 @@ if __name__ == "__main__":
     print(form)
 
     indented_print("test")
-    test()
