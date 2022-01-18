@@ -434,10 +434,7 @@ class ITEOperator(Operator):
 
 class NorOperator(Operator):
     def calculate_value(self):
-        for c in self.children:
-            if c.calculate_value():
-                return False
-        return True
+        return not any(c.calculate_value() for c in self.children)
 
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
@@ -453,10 +450,7 @@ class NorOperator(Operator):
 
 class NandOperator(Operator):
     def calculate_value(self):
-        for c in self.children:
-            if not c.calculate_value():
-                return True
-        return False
+        return any(not c.calculate_value() for c in self.children)
 
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
