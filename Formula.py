@@ -110,7 +110,7 @@ class Formula:
         for key, value in dict.items():
             self.variables[key].value = value
 
-    def kv(self):
+    def kv(self, scale=1):
         values = generate_kv(list(self.variables.keys()))
         matrix = []
         for row in values:
@@ -120,7 +120,7 @@ class Formula:
                 val = self.root.calculate_value()
                 new_row.append(val)
             matrix.append(new_row)
-        kv_generator.render_kv_diagramm(matrix, list(self.variables.keys()))
+        kv_generator.render_kv_diagramm(matrix, list(self.variables.keys()), scale=scale)
 
     def __str__(self):
         return str(self.root)
