@@ -88,6 +88,11 @@ class Operator(Token, ABC):
             self.children[i] = self.children[i].smart_expand()
         return self
 
+    def smart_exclude(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].smart_exclude()
+        return self
+
     def to_nand(self):
         for i in range(len(self.children)):
             self.children[i] = self.children[i].replace_with_and_or().to_nand()
@@ -161,6 +166,37 @@ class AndOrOperator(Operator, ABC):
 
         return self
 
+    def smart_exclude(self):
+        super().smart_exclude()
+
+        if isinstance(self, OrOperator):
+            child_operator = AndOperator
+        else:
+            child_operator = OrOperator
+
+        rem = []
+        for i in range(len(self.children)):
+            if isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
+                    isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator):
+                for j in range(len(self.children)):
+                    if self.children[i] != self.children[j] and \
+                            (isinstance(self.children[j], AndOperator) and isinstance(self.children[i], AndOperator) or
+                             isinstance(self.children[j], OrOperator) and isinstance(self.children[i], OrOperator)):
+                        intersection = [value for value in self.children[i].children if
+                                        value in self.children[j].children]
+                        if len(intersection) > 0:
+                            for it in intersection:
+                                rem.append(self.children[i])
+                                rem.append(self.children[j])
+                                if it not in self.children:
+                                    self.children.append(it)
+
+        for it in rem:
+            if it in self.children:
+                self.children.remove(it)
+
+        return self
+
     def idempotence(self):
         super().idempotence()
 
@@ -217,6 +253,7 @@ class AndOrOperator(Operator, ABC):
                     return False
             return True
         return False
+
 
 class NotOperator(Operator):
     def calculate_value(self):

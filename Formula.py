@@ -56,6 +56,12 @@ class Formula:
             self.root = self.root.identity()
             self.root = self.root.not_operator_simplify()
             self.root = self.root.smart_expand()
+
+        previous_form = ''
+        while previous_form != str(self):
+            previous_form = str(self)
+            self.root = self.root.smart_exclude()
+
         return self
 
     def get_values(self):

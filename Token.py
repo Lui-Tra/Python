@@ -45,6 +45,9 @@ class Token(ABC):
     def smart_expand(self):
         return self
 
+    def smart_exclude(self):
+        return self
+
     def to_nand(self):
         return self
 
