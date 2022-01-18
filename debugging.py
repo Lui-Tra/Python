@@ -20,5 +20,5 @@ def indented_print(*args, **kwargs):
     size = stack_size()
     if initial_stack_size is None or size < initial_stack_size:
         initial_stack_size = size
-    print("   "*(size-initial_stack_size), end="")
+    print("   " * (size - initial_stack_size), end="")
     print(*args, **kwargs)
