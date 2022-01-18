@@ -190,13 +190,6 @@ class AndOrOperator(Operator, ABC):
     def smart_exclude(self):
         super().smart_exclude()
 
-
-
-        if isinstance(self, OrOperator):
-            child_operator = AndOperator
-        else:
-            child_operator = OrOperator
-
         absolutely_new_children = []
 
         rem = []
