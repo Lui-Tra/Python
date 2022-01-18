@@ -123,24 +123,33 @@ class Formula:
 
     def simple_cnf(self):
         self.canonical_cnf()
-        for i in range(len(self.root.children)):
-            for j in range(len(self.root.children)):
-                or1 = self.root.children[i]
-                or2 = self.root.children[j]
-                if i != j:
-                    difference = [value for value in or1.children if value not in or2.children]
-                    simplify = True
-                    for it in difference:
-                        if not (isinstance(it, Variable) and NotOperator(it) in difference or
-                                isinstance(it, NotOperator) and it.children[0] in difference):
-                            simplify = False
 
-                    if simplify:
-                        self.root.children[j] = None
+        previous = ''
+        while previous != str(self):
+            previous = str(self)
+            for i in range(len(self.root.children)):
+                for j in range(len(self.root.children)):
+                    or1 = self.root.children[i]
+                    or2 = self.root.children[j]
+
+                    if i != j and or1 is not None and or2 is not None:
+                        difference = [value for value in or1.children + or2.children
+                                      if value not in or2.children and value in or1.children
+                                      or value in or2.children and value not in or1.children]
+
+                        simplify = True
                         for it in difference:
-                            or1.children.remove(it)
+                            if not (isinstance(it, Variable) and NotOperator(it) in difference or
+                                    isinstance(it, NotOperator) and it.children[0] in difference):
+                                simplify = False
 
-        self.root.children = list(filter(lambda it: it is not None, self.root.children))
+                        if simplify:
+                            self.root.children[j] = None
+                            for it in difference:
+                                if it in or1.children:
+                                    or1.children.remove(it)
+
+            self.root.children = list(filter(lambda it: it is not None, self.root.children))
         return self
 
     def to_nand(self):
