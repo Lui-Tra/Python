@@ -36,13 +36,8 @@ class Token(ABC):
     def identity(self):
         return self
 
-    @abstractmethod
-    def nnf(self):
-        pass
-
-    @abstractmethod
     def simplify(self):
-        pass
+        return self
 
     def __repr__(self):
         return str(self)

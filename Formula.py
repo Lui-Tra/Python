@@ -43,12 +43,10 @@ class Formula:
             print(val, end=" | ")
         print(self.root.get_truth_table_entry(0))
 
-    def nnf(self):
-        self.root = self.root.nnf()
-        return self
-
     def simplify(self):
-        self.root = self.root.simplify()
+        previous_form = ''
+        while previous_form != str(self):
+            self.root = self.root.simplify()
         return self
 
     def get_values(self):

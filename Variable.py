@@ -17,12 +17,6 @@ class Variable(Token):
     def get_truth_table_entry(self, depth):
         return center(self.value, len(self.name), depth=depth)
 
-    def nnf(self):
-        return self
-
-    def simplify(self):
-        return self
-
     def __str__(self):
         return self.name
 

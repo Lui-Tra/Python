@@ -43,12 +43,6 @@ class Operator(Token, ABC):
         res += ")"
         return res
 
-    def nnf(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].nnf()
-
-        return self
-
     def simplify(self):
         for i in range(len(self.children)):
             self.children[i] = self.children[i].simplify()
@@ -167,22 +161,6 @@ class NotOperator(Operator):
     def get_truth_table_entry(self, depth):
         return center(self.value, 2, depth) + self.children[0].get_truth_table_entry(depth + 1)
 
-    def nnf(self):
-        super().nnf()
-
-        if isinstance(self.children[0], NotOperator):
-            return self.children[0].children[0].nnf()
-        elif isinstance(self.children[0], AndOperator):
-            return OrOperator(list(map(NotOperator, self.children[0].children))).nnf()
-        elif isinstance(self.children[0], OrOperator):
-            return AndOperator(list(map(NotOperator, self.children[0].children))).nnf()
-        elif isinstance(self.children[0], Variable) and self.children[0] == Variable("true", True):
-            return Variable("false", False)
-        elif isinstance(self.children[0], Variable) and self.children[0] == Variable("false", False):
-            return Variable("true", True)
-
-        return super().nnf()
-
     def simplify(self):
         super().simplify()
 
@@ -231,64 +209,6 @@ class AndOperator(AndOrOperator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().basic_simplify(AndOperator, OrOperator)
-
-        if Variable("false", False) in self.children:
-            return Variable("false", False)
-        elif Variable("true", True) in self.children:
-            self.children.remove(Variable("true", True))
-
-        if len(self.children) == 1:
-            return self.children[0].nnf()
-
-        return super().nnf()
-
-    def simplify2(self):
-        # Triviale Kontradiktion
-        for child in self.children:
-            if NotOperator(child) in self.children:
-                return FALSE
-
-        # Dominanz
-        if FALSE in self.children:
-            return FALSE
-
-        # Identität
-        while TRUE in self.children:
-            self.children.remove(TRUE)
-
-        if len(self.children) == 0:
-            return TRUE
-
-        return self
-
-    def simplify(self):
-        super().simplify()
-
-        res = self.simplify2()
-        if res != self:
-            return res
-
-        rem = []
-        for child in self.children:
-            if not isinstance(child, OrOperator):
-                rem.append(child)
-                for orOp in self.children:
-                    if isinstance(orOp, OrOperator):
-                        orOp.children.append(child)
-        for it in rem:
-            self.children.remove(it)
-
-        res = self.simplify2()
-        if res != self:
-            return res
-
-        if len(self.children) == 1:
-            return self.children[0]
-
-        return self
-
     def __str__(self):
         return self.multiple_traverse(operators["and"])
 
@@ -311,64 +231,6 @@ class OrOperator(AndOrOperator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().basic_simplify(OrOperator, AndOperator)
-
-        if Variable("true", True) in self.children:
-            return Variable("true", True)
-        elif Variable("false", False) in self.children:
-            self.children.remove(Variable("false", False))
-
-        if len(self.children) == 1:
-            return self.children[0].nnf()
-
-        return super().nnf()
-
-    def simplify2(self):
-        # Triviale Tautologie
-        for child in self.children:
-            if NotOperator(child) in self.children:
-                return TRUE
-
-        # Dominanz
-        if TRUE in self.children:
-            return TRUE
-
-        # Identität
-        while FALSE in self.children:
-            self.children.remove(FALSE)
-
-        if len(self.children) == 0:
-            return FALSE
-
-        return self
-
-    def simplify(self):
-        super().simplify()
-
-        res = self.simplify2()
-        if res != self:
-            return res
-
-        rem = []
-        for child in self.children:
-            if not isinstance(child, AndOperator):
-                rem.append(child)
-                for andOp in self.children:
-                    if isinstance(andOp, AndOperator):
-                        andOp.children.append(child)
-        for it in rem:
-            self.children.remove(it)
-
-        res = self.simplify2()
-        if res != self:
-            return res
-
-        if len(self.children) == 1:
-            return self.children[0]
-
-        return self
-
     def __str__(self):
         return self.multiple_traverse(operators["or"])
 
@@ -390,21 +252,11 @@ class XorOperator(Operator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().nnf()
-
-        return AndOperator([
-            OrOperator(self.children),
-            OrOperator(list(map(NotOperator, self.children)))
-        ]).nnf()
-
     def simplify(self):
-        super().simplify()
-
         return AndOperator([
             OrOperator(self.children),
             OrOperator(list(map(NotOperator, self.children)))
-        ])
+        ]).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
@@ -426,21 +278,11 @@ class ImplicationOperator(Operator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().nnf()
-
-        return OrOperator(
-            NotOperator(self.children[0]),
-            self.children[1]
-        ).nnf()
-
     def simplify(self):
-        super().nnf()
-
         return OrOperator(
             NotOperator(self.children[0]),
             self.children[1]
-        ).nnf()
+        ).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["implication"])
@@ -463,15 +305,8 @@ class BiConditionalOperator(Operator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().nnf()
-
-        return NotOperator(XorOperator(self.children)).nnf()
-
     def simplify(self):
-        super().nnf()
-
-        return NotOperator(XorOperator(self.children)).nnf()
+        return NotOperator(XorOperator(self.children)).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["bi-conditional"])
@@ -503,21 +338,11 @@ class ITEOperator(Operator):
         res += ")"
         return res
 
-    def nnf(self):
-        super().nnf()
-
-        return AndOperator(
-            ImplicationOperator(self.children[0], self.children[1]),
-            ImplicationOperator(NotOperator(self.children[0]), self.children[2])
-        ).nnf()
-
     def simplify(self):
-        super().nnf()
-
         return AndOperator(
             ImplicationOperator(self.children[0], self.children[1]),
             ImplicationOperator(NotOperator(self.children[0]), self.children[2])
-        ).nnf()
+        ).simplify()
 
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
@@ -531,9 +356,7 @@ class NorOperator(Operator):
         raise NotImplemented("Fehlt noch")
 
     def simplify(self):
-        super().simplify()
-
-        return NotOperator(OrOperator(self.children))
+        return NotOperator(OrOperator(self.children)).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["nor"])
@@ -547,9 +370,7 @@ class NandOperator(Operator):
         raise NotImplemented("Fehlt noch")
 
     def simplify(self):
-        super().simplify()
-
-        return NotOperator(AndOperator(self.children))
+        return NotOperator(AndOperator(self.children)).simplify()
 
     def __str__(self):
         return self.multiple_traverse(operators["nand"])
