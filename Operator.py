@@ -142,7 +142,7 @@ class AndOrOperator(Operator, ABC):
                             isinstance(var, NotOperator) and var.children[0] in self.children[i].children:
                         new_children = []
                         for child in self.children[i].children:
-                            new_children.append(self.__class__(self.children[i], child))
+                            new_children.append(self.__class__(var, child))
                         self.children[i] = child_operator(new_children)
                         rem.append(var)
 
