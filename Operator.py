@@ -210,6 +210,13 @@ class AndOrOperator(Operator, ABC):
 
         return self
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__) and len(self.children) == len(other.children):
+            for i in range(len(self.children)):
+                if self.children[i] != other.children[i]:
+                    return False
+            return True
+        return False
 
 class NotOperator(Operator):
     def calculate_value(self):
@@ -275,7 +282,18 @@ class AndOperator(AndOrOperator):
     def to_nand(self):
         super().to_nand()
 
-        return NandOperator(NandOperator(self.children), NandOperator(self.children))
+        if len(self.children) > 2:
+            return OrOperator(
+                NandOperator(
+                    NandOperator(self.children[0], self.children[1]),
+                    NandOperator(self.children[0], self.children[1])
+                ),
+                *self.children[2:]).to_nand()
+        else:
+            return NandOperator(
+                NandOperator(self.children[0], self.children[1]),
+                NandOperator(self.children[0], self.children[1])
+            )
 
     def __str__(self):
         return self.multiple_traverse(operators["and"])
@@ -299,7 +317,18 @@ class OrOperator(AndOrOperator):
     def to_nand(self):
         super().to_nand()
 
-        return NandOperator(list(map(lambda it: NandOperator([it] * 2), self.children)))
+        if len(self.children) > 2:
+            return AndOperator(
+                NandOperator(
+                    NandOperator(self.children[0], self.children[0]),
+                    NandOperator(self.children[1], self.children[1])
+                ),
+                *self.children[2:]).to_nand()
+        else:
+            return NandOperator(
+                NandOperator(self.children[0], self.children[0]),
+                NandOperator(self.children[1], self.children[1])
+            )
 
     def __str__(self):
         return self.multiple_traverse(operators["or"])
