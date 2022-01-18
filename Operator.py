@@ -211,7 +211,6 @@ class AndOrOperator(Operator, ABC):
         new_children_2 = [child if isinstance(child, Variable) or len(child.children) != 1 else child.children[0] for child in new_children]
 
         if len(absolutely_new_children) > 0:
-            indented_print(absolutely_new_children, new_children)
             if isinstance(self, OrOperator):
                 return AndOperator(*absolutely_new_children, OrOperator(new_children_2))
             else:
