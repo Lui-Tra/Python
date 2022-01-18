@@ -1,7 +1,7 @@
 from abc import ABC
 
 from Token import Token
-from Variable import Variable, FALSE, TRUE
+from Variable import FALSE, TRUE
 from constants import operators, center
 
 
@@ -43,9 +43,45 @@ class Operator(Token, ABC):
         res += ")"
         return res
 
-    def simplify(self):
+    def associative_law(self):
         for i in range(len(self.children)):
-            self.children[i] = self.children[i].simplify()
+            self.children[i] = self.children[i].associative_law()
+        return self
+
+    def absorption(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].absorption()
+        return self
+
+    def idempotence(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].idempotence()
+        return self
+
+    def trivial_simplification(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].trivial_simplification()
+        return self
+
+    def dominance(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].dominance()
+        return self
+
+    def identity(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].identity()
+        return self
+
+    def not_operator_simplify(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].not_operator_simplify()
+        return self
+
+    def replace_with_and_or(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].replace_with_and_or()
+        return self
 
     def clone(self):
         return self.__class__([child.clone for child in self.children])
@@ -53,8 +89,7 @@ class Operator(Token, ABC):
 
 class AndOrOperator(Operator, ABC):
     def associative_law(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].associative_law()
+        super().associative_law()
 
         add_new = []
         rem = []
@@ -70,8 +105,7 @@ class AndOrOperator(Operator, ABC):
         return self
 
     def absorption(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].absorption()
+        super().absorption()
 
         rem = []
         for i in range(len(self.children)):
@@ -88,8 +122,7 @@ class AndOrOperator(Operator, ABC):
         return self
 
     def idempotence(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].idempotence()
+        super().idempotence()
 
         new_children = []
         for child in self.children:
@@ -103,8 +136,7 @@ class AndOrOperator(Operator, ABC):
         return self
 
     def trivial_simplification(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].trivial_simplification()
+        super().trivial_simplification()
 
         for child in self.children:
             if NotOperator(child) in self.children:
@@ -116,8 +148,7 @@ class AndOrOperator(Operator, ABC):
         return self
 
     def dominance(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].dominance()
+        super().dominance()
 
         if isinstance(self, OrOperator) and TRUE in self.children:
             return TRUE
@@ -127,8 +158,7 @@ class AndOrOperator(Operator, ABC):
         return self
 
     def identity(self):
-        for i in range(len(self.children)):
-            self.children[i] = self.children[i].identity()
+        super().identity()
 
         if isinstance(self, OrOperator):
             while FALSE in self.children and len(self.children) > 1:
@@ -137,15 +167,6 @@ class AndOrOperator(Operator, ABC):
             if isinstance(self, AndOperator):
                 while TRUE in self.children and len(self.children) > 1:
                     self.children.remove(TRUE)
-
-        return self
-
-    def simplify(self):
-        super().simplify()
-
-        self.associative_law()
-        self.idempotence()
-        self.absorption()
 
         return self
 
@@ -161,8 +182,8 @@ class NotOperator(Operator):
     def get_truth_table_entry(self, depth):
         return center(self.value, 2, depth) + self.children[0].get_truth_table_entry(depth + 1)
 
-    def simplify(self):
-        super().simplify()
+    def not_operator_simplify(self):
+        super().not_operator_simplify()
 
         # Doppelnegation
         if isinstance(self.children[0], NotOperator):
@@ -170,9 +191,9 @@ class NotOperator(Operator):
 
         # deMorgan
         elif isinstance(self.children[0], AndOperator):
-            return OrOperator(list(map(NotOperator, self.children[0].children))).simplify()
+            return OrOperator(list(map(NotOperator, self.children[0].children)))
         elif isinstance(self.children[0], OrOperator):
-            return AndOperator(list(map(NotOperator, self.children[0].children))).simplify()
+            return AndOperator(list(map(NotOperator, self.children[0].children)))
 
         # Negation
         elif self.children[0] == TRUE:
@@ -252,11 +273,13 @@ class XorOperator(Operator):
         res += ")"
         return res
 
-    def simplify(self):
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
         return AndOperator([
             OrOperator(self.children),
             OrOperator(list(map(NotOperator, self.children)))
-        ]).simplify()
+        ]).replace_with_and_or()
 
     def __str__(self):
         return self.multiple_traverse(operators["xor"])
@@ -278,11 +301,13 @@ class ImplicationOperator(Operator):
         res += ")"
         return res
 
-    def simplify(self):
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
         return OrOperator(
             NotOperator(self.children[0]),
             self.children[1]
-        ).simplify()
+        ).replace_with_and_or()
 
     def __str__(self):
         return self.multiple_traverse(operators["implication"])
@@ -305,8 +330,10 @@ class BiConditionalOperator(Operator):
         res += ")"
         return res
 
-    def simplify(self):
-        return NotOperator(XorOperator(self.children)).simplify()
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
+        return NotOperator(XorOperator(self.children)).replace_with_and_or()
 
     def __str__(self):
         return self.multiple_traverse(operators["bi-conditional"])
@@ -338,11 +365,13 @@ class ITEOperator(Operator):
         res += ")"
         return res
 
-    def simplify(self):
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
         return AndOperator(
             ImplicationOperator(self.children[0], self.children[1]),
             ImplicationOperator(NotOperator(self.children[0]), self.children[2])
-        ).simplify()
+        ).replace_with_and_or()
 
     def __str__(self):
         return operators["ite"] + "(" + ", ".join(list(map(str, self.children))) + ")"
@@ -355,8 +384,10 @@ class NorOperator(Operator):
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
 
-    def simplify(self):
-        return NotOperator(OrOperator(self.children)).simplify()
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
+        return NotOperator(OrOperator(self.children)).replace_with_and_or()
 
     def __str__(self):
         return self.multiple_traverse(operators["nor"])
@@ -369,8 +400,10 @@ class NandOperator(Operator):
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
 
-    def simplify(self):
-        return NotOperator(AndOperator(self.children)).simplify()
+    def replace_with_and_or(self):
+        super().replace_with_and_or()
+
+        return NotOperator(AndOperator(self.children)).replace_with_and_or()
 
     def __str__(self):
         return self.multiple_traverse(operators["nand"])

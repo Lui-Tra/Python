@@ -46,7 +46,15 @@ class Formula:
     def simplify(self):
         previous_form = ''
         while previous_form != str(self):
-            self.root = self.root.simplify()
+            previous_form = str(self)
+            self.root = self.root.replace_with_and_or()
+            self.root = self.root.associative_law()
+            self.root = self.root.absorption()
+            self.root = self.root.idempotence()
+            self.root = self.root.trivial_simplification()
+            self.root = self.root.dominance()
+            self.root = self.root.identity()
+            self.root = self.root.not_operator_simplify()
         return self
 
     def get_values(self):

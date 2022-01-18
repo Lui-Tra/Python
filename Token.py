@@ -36,7 +36,10 @@ class Token(ABC):
     def identity(self):
         return self
 
-    def simplify(self):
+    def not_operator_simplify(self):
+        return self
+
+    def replace_with_and_or(self):
         return self
 
     def __repr__(self):
