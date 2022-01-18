@@ -176,5 +176,5 @@ def parse(formula):
 if __name__ == "__main__":
     form = parse("(a and (not b or not (c and not d)))")
     print(form)
-    form.simple_cnf()
+    form.simple_cnf().kv()
     print(form)
