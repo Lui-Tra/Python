@@ -188,7 +188,7 @@ class AndOrOperator(Operator, ABC):
 
         return self
 
-    def smart_exclude(self):
+    def smart_exclude_alt(self):
         super().smart_exclude()
         absolutely_new_children = []
 
@@ -217,6 +217,33 @@ class AndOrOperator(Operator, ABC):
                 return OrOperator(*absolutely_new_children, AndOperator(new_children_2))
         else:
             return self
+
+    def smart_exclude(self):
+        super().smart_exclude()
+
+        if isinstance(self, OrOperator):
+            outer_class = OrOperator
+            inner_class = AndOperator
+        else:
+            outer_class = AndOperator
+            inner_class = OrOperator
+
+        if any(not isinstance(child, inner_class) for child in self.children):
+            return self
+
+        intersection = self.children[0].children
+        for child in self.children:
+            intersection = [elem for elem in intersection if elem in child.children]
+
+        if len(intersection) == 0:
+            return self
+
+        for child in self.children:
+            child.children = [elem for elem in child.children if elem not in intersection]
+
+        self.children = [child if len(child.children) != 1 else child.children[0]
+                         for child in self.children if len(child.children) > 0]
+        return inner_class(*intersection, outer_class(self.children))
 
     def idempotence(self):
         super().idempotence()
