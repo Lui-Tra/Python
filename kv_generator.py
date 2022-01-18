@@ -54,7 +54,7 @@ def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_widt
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                return
         screen.fill("#ffffff")
         render_cells(diagramm, screen, scale, block_width, border_width, side_distance)
         render_names(variables, screen, scale, block_width, border_width, side_distance)
