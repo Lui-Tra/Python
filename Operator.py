@@ -186,8 +186,8 @@ class AndOrOperator(Operator, ABC):
                                         value in self.children[j].children]
                         if len(intersection) > 0:
                             for it in intersection:
-                                rem.append(self.children[i])
-                                rem.append(self.children[j])
+                                self.children[i].children.remove(it)
+                                self.children[j].children.remove(it)
                                 if it not in self.children:
                                     self.children.append(it)
 
