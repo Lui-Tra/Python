@@ -4,6 +4,5 @@ import parser
 if __name__ == "__main__":
     formula = parser.parse("¬(s ↔ t) ⊕ ((q ↔ t) → ¬s)")
     print(formula)
-    formula.simplify()
+    formula.root = formula.root.to_nand()
     print(formula)
-    formula.kv()

@@ -89,9 +89,13 @@ class Operator(Token, ABC):
         return self
 
     def to_nand(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].replace_with_and_or().to_nand()
         return self
 
     def to_nor(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].replace_with_and_or().to_nor()
         return self
 
     def clone(self):
