@@ -246,7 +246,7 @@ class NotOperator(Operator):
     def to_nand(self):
         super().to_nand()
 
-        return NandOperator(self, self)
+        return NandOperator(self.children[0], self.children[0])
 
     def __str__(self):
         return self.unary_traverse(operators["not"])
