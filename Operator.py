@@ -275,6 +275,11 @@ class AndOperator(AndOrOperator):
         res += ")"
         return res
 
+    def to_nand(self):
+        super().to_nand()
+
+        return NandOperator(NandOperator(self.children), NandOperator(self.children))
+
     def __str__(self):
         return self.multiple_traverse(operators["and"])
 
@@ -296,6 +301,11 @@ class OrOperator(AndOrOperator):
         res = res[:-len(op_str)]
         res += ")"
         return res
+
+    def to_nand(self):
+        super().to_nand()
+
+        return NandOperator(list(map(lambda it: NandOperator([it] * 2), self.children)))
 
     def __str__(self):
         return self.multiple_traverse(operators["or"])
