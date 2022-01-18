@@ -88,6 +88,12 @@ class Operator(Token, ABC):
             self.children[i] = self.children[i].smart_expand()
         return self
 
+    def to_nand(self):
+        return self
+
+    def to_nor(self):
+        return self
+
     def clone(self):
         return self.__class__([child.clone for child in self.children])
 
