@@ -1,7 +1,7 @@
 from abc import ABC
 
 from Token import Token
-from Variable import FALSE, TRUE
+from Variable import FALSE, TRUE, Variable
 from constants import operators, center
 
 
@@ -83,6 +83,11 @@ class Operator(Token, ABC):
             self.children[i] = self.children[i].replace_with_and_or()
         return self
 
+    def smart_expand(self):
+        for i in range(len(self.children)):
+            self.children[i] = self.children[i].smart_expand()
+        return self
+
     def clone(self):
         return self.__class__([child.clone for child in self.children])
 
@@ -109,8 +114,7 @@ class AndOrOperator(Operator, ABC):
 
         rem = []
         for i in range(len(self.children)):
-            if isinstance(self.children[i], Operator) and \
-                    isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
+            if isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or \
                     isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator):
                 for var in self.children:
                     if var in self.children[i].children:
@@ -118,6 +122,32 @@ class AndOrOperator(Operator, ABC):
         for it in rem:
             if it in self.children:
                 self.children.remove(it)
+
+        return self
+
+    def smart_expand(self):
+        super().smart_expand()
+
+        if isinstance(self, OrOperator):
+            child_operator = AndOperator
+        else:
+            child_operator = OrOperator
+
+        rem = []
+        for i in range(len(self.children)):
+            if (isinstance(self, OrOperator) and isinstance(self.children[i], AndOperator) or
+                    isinstance(self, AndOperator) and isinstance(self.children[i], OrOperator)):
+                for var in self.children:
+                    if isinstance(var, Variable) and NotOperator(var) in self.children[i].children or \
+                            isinstance(var, NotOperator) and var.children[0] in self.children[i].children:
+                        new_children = []
+                        for child in self.children[i].children:
+                            new_children.append(self.__class__(self.children[i], child))
+                        self.children[i] = child_operator(new_children)
+                        rem.append(var)
+
+        for it in rem:
+            self.children.remove(it)
 
         return self
 
@@ -407,6 +437,5 @@ class NandOperator(Operator):
 
     def __str__(self):
         return self.multiple_traverse(operators["nand"])
-
 
 # TODO: nur nand oder nor

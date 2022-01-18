@@ -55,6 +55,7 @@ class Formula:
             self.root = self.root.dominance()
             self.root = self.root.identity()
             self.root = self.root.not_operator_simplify()
+            self.root = self.root.smart_expand()
         return self
 
     def get_values(self):

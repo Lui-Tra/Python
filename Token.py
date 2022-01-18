@@ -42,5 +42,8 @@ class Token(ABC):
     def replace_with_and_or(self):
         return self
 
+    def smart_expand(self):
+        return self
+
     def __repr__(self):
         return str(self)
