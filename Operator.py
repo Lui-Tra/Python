@@ -19,6 +19,27 @@ def get_operator(operator_name, children):
     }[operator_name](children)
 
 
+def get_operator_symbol(operator):
+    res = "?"
+    current_cls = None
+    for symbol, cls in {
+        operators["not"]: NotOperator,
+        operators["and"]: AndOperator,
+        operators["or"]: OrOperator,
+        operators["xor"]: XorOperator,
+        operators["implication"]: ImplicationOperator,
+        operators["bi-conditional"]: BiConditionalOperator,
+        operators["ite"]: ITEOperator,
+        operators["nand"]: NandOperator,
+        operators["nor"]: NorOperator,
+    }:
+        if isinstance(operator, cls):
+            if not current_cls or issubclass(cls, current_cls):
+                current_cls = cls
+                res = symbol
+    return res
+
+
 class Operator(Token, ABC):
     def __init__(self, *children):
         super().__init__()
@@ -169,10 +190,14 @@ class AndOrOperator(Operator, ABC):
     def smart_exclude(self):
         super().smart_exclude()
 
+
+
         if isinstance(self, OrOperator):
             child_operator = AndOperator
         else:
             child_operator = OrOperator
+
+        absolutely_new_children = []
 
         rem = []
         for i in range(len(self.children)):
@@ -188,14 +213,19 @@ class AndOrOperator(Operator, ABC):
                             for it in intersection:
                                 self.children[i].children.remove(it)
                                 self.children[j].children.remove(it)
-                                if it not in self.children:
-                                    self.children.append(it)
+                                absolutely_new_children.append(it)
 
         for it in rem:
             if it in self.children:
                 self.children.remove(it)
 
-        return self
+        if len(absolutely_new_children) > 0:
+            if isinstance(self, OrOperator):
+                return AndOperator(*absolutely_new_children, OrOperator(self.children))
+            else:
+                return OrOperator(*absolutely_new_children, AndOperator(self.children))
+        else:
+            return self
 
     def idempotence(self):
         super().idempotence()
@@ -261,7 +291,7 @@ class NotOperator(Operator):
         return self.value
 
     def get_truth_table_header(self, depth):
-        return center(operators["not"], 2, depth) + self.children[0].get_truth_table_header(depth + 1)
+        return center(get_operator_symbol(self), 2, depth) + self.children[0].get_truth_table_header(depth + 1)
 
     def get_truth_table_entry(self, depth):
         return center(self.value, 2, depth) + self.children[0].get_truth_table_entry(depth + 1)
