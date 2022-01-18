@@ -174,7 +174,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    formula = "a xor b xor c xor d xor e xor f xor x"
+    formula = "a or b"
 
     root = parse(formula)
-    root.kv()
+    root.print_truth_table()

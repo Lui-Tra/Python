@@ -259,7 +259,8 @@ class NotOperator(Operator):
 
 class AndOperator(AndOrOperator):
     def calculate_value(self):
-        return all(c.calculate_value() for c in self.children)
+        self.value = all(c.calculate_value() for c in self.children)
+        return self.value
 
     def get_truth_table_header(self, depth):
         res = "("
@@ -282,7 +283,8 @@ class AndOperator(AndOrOperator):
 
 class OrOperator(AndOrOperator):
     def calculate_value(self):
-        return any(c.calculate_value() for c in self.children)
+        self.value = any(c.calculate_value() for c in self.children)
+        return self.value
 
     def get_truth_table_header(self, depth):
         res = "("
@@ -426,7 +428,8 @@ class ITEOperator(Operator):
 
 class NorOperator(Operator):
     def calculate_value(self):
-        return not any(c.calculate_value() for c in self.children)
+        self.value = not any(c.calculate_value() for c in self.children)
+        return self.value
 
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
@@ -442,7 +445,8 @@ class NorOperator(Operator):
 
 class NandOperator(Operator):
     def calculate_value(self):
-        return any(not c.calculate_value() for c in self.children)
+        self.value = any(not c.calculate_value() for c in self.children)
+        return self.value
 
     def get_truth_table_header(self, depth):
         raise NotImplemented("Fehlt noch")
