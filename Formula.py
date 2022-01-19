@@ -153,6 +153,13 @@ class Formula:
 
         return self
 
+    def simple_dnf(self):
+        self.canonical_dnf()
+
+
+
+        return self
+
     def to_nand(self):
         self.simplify()
         self.root = self.root.to_nand()
