@@ -124,32 +124,33 @@ class Formula:
     def simple_cnf(self):
         self.canonical_cnf()
 
-        previous = ''
-        while previous != str(self):
-            previous = str(self)
-            for i in range(len(self.root.children)):
-                for j in range(len(self.root.children)):
-                    or1 = self.root.children[i]
-                    or2 = self.root.children[j]
+        for or1 in self.root.children:
+            for or2 in self.root.children:
+                if or1 != or2 and len(or1.children) <= len(or2.children):
+                    difference = [val for val in or1.children
+                                  if val not in or2.children]
 
-                    if i != j and or1 is not None and or2 is not None:
-                        difference = [value for value in or1.children + or2.children
-                                      if value not in or2.children and value in or1.children
-                                      or value in or2.children and value not in or1.children]
+                    if len(difference) == 1:
+                        if isinstance(difference[0], Variable):
+                            inverted_diff_var = NotOperator(difference[0])
+                        else:
+                            inverted_diff_var = difference[0].children[0]
 
-                        simplify = True
-                        for it in difference:
-                            if not (isinstance(it, Variable) and NotOperator(it) in difference or
-                                    isinstance(it, NotOperator) and it.children[0] in difference):
-                                simplify = False
+                        if inverted_diff_var in or2.children:
+                            or2.children.remove(inverted_diff_var)
 
-                        if simplify:
-                            self.root.children[j] = None
-                            for it in difference:
-                                if it in or1.children:
-                                    or1.children.remove(it)
+        for i in range(len(self.root.children)):
+            for j in range(len(self.root.children)):
+                or1 = self.root.children[i]
+                or2 = self.root.children[j]
+                if i != j and 0 < len(or1.children) <= len(or2.children):
+                    difference = [val for val in or1.children
+                                  if val not in or2.children]
+                    if len(difference) == 0:
+                        or2.children = []
 
-            self.root.children = list(filter(lambda it: it is not None, self.root.children))
+        self.root.children = list(filter(lambda it: len(it.children) > 0, self.root.children))
+
         return self
 
     def to_nand(self):

@@ -1,11 +1,7 @@
 import parser
 
 if __name__ == "__main__":
-    form = parser.parse("(a and b) or (a and c) or (c and halloFlo)")
-    form.simplify()
-    print(form)
-
-    form = parser.parse("(a and b and e) or (b and a and d) or (a and f)")
-    print(form)
-    form.simplify()
+    form = parser.parse("(A ↔ (B → C))")
+    print(form.canonical_cnf())
+    form.simple_cnf()
     print(form)

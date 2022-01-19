@@ -133,6 +133,9 @@ class AndOrOperator(Operator, ABC):
     def associative_law(self):
         super().associative_law()
 
+        if len(self.children) == 1:
+            return self.children[0].associative_law()
+
         add_new = []
         rem = []
         for child in self.children:
@@ -319,13 +322,13 @@ class NotOperator(Operator):
 
         # Doppelnegation
         if isinstance(self.children[0], NotOperator):
-            return self.children[0].children[0]
+            return self.children[0].children[0].not_operator_simplify()
 
         # deMorgan
         elif isinstance(self.children[0], AndOperator):
-            return OrOperator(list(map(NotOperator, self.children[0].children)))
+            return OrOperator(list(map(NotOperator, self.children[0].children))).not_operator_simplify()
         elif isinstance(self.children[0], OrOperator):
-            return AndOperator(list(map(NotOperator, self.children[0].children)))
+            return AndOperator(list(map(NotOperator, self.children[0].children))).not_operator_simplify()
 
         # Negation
         elif self.children[0] == TRUE:
