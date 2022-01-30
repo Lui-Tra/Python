@@ -174,7 +174,8 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("(a and (not b or not (c and not d)))")
+    form = parse("(((¬q ∧ ¬t) ∨ (p ∨ t)) ∨ (q ∧ ((¬t ∨ p) ∧ (¬p ∨ t)))) ∨ (((q ∨ t) ∧ (¬p ∧ ¬t)) ∧ (¬q ∨ ((t ∧ ¬p) ∨ (p ∧ ¬t))))")
     print(form)
-    form.simple_cnf().kv()
-    print(form)
+    form.kv(order = "tpq")
+    form.kv(order = ("p", "q", "t"))
+    print(form.simplify())

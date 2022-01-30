@@ -156,8 +156,6 @@ class Formula:
     def simple_dnf(self):
         self.canonical_dnf()
 
-
-
         return self
 
     def to_nand(self):
@@ -179,8 +177,8 @@ class Formula:
         for key, value in dict.items():
             self.variables[key].value = value
 
-    def kv(self, scale=1):
-        values = generate_kv(list(self.variables.keys()))
+    def kv(self, scale=1, order=None):
+        values = generate_kv(order or list(self.variables.keys()))
         matrix = []
         for row in values:
             new_row = []
@@ -189,7 +187,7 @@ class Formula:
                 val = self.root.calculate_value()
                 new_row.append(val)
             matrix.append(new_row)
-        kv_generator.render_kv_diagramm(matrix, list(self.variables.keys()), scale=scale)
+        kv_generator.render_kv_diagramm(matrix, order or list(self.variables.keys()), scale=scale)
 
     def __str__(self):
         return str(self.root)
