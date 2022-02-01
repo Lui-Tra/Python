@@ -57,9 +57,19 @@ class Operator(Token, ABC):
 
     def get_truth_table_entry(self, depth):
         res = "("
-        op_str = center(self.value, 3, depth)
+        op_str = center(self.value, len(get_operator_symbol(self))+2, depth)
         for child in self.children:
             res += child.get_truth_table_entry(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
+        res += ")"
+        return res
+
+    def get_truth_table_header(self, depth):
+        res = "("
+        op_str = center(get_operator_symbol(self), len(get_operator_symbol(self))+2, depth)
+        for child in self.children:
+            res += child.get_truth_table_header(depth + 1)
             res += op_str
         res = res[:-len(op_str)]
         res += ")"
@@ -357,16 +367,6 @@ class AndOperator(AndOrOperator):
         self.value = all([c.calculate_value() for c in self.children])
         return self.value
 
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["and"], 3, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
-
     def to_nand(self):
         super().to_nand()
 
@@ -391,16 +391,6 @@ class OrOperator(AndOrOperator):
     def calculate_value(self):
         self.value = any([c.calculate_value() for c in self.children])
         return self.value
-
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["or"], 3, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
 
     def to_nand(self):
         super().to_nand()
@@ -429,16 +419,6 @@ class XorOperator(Operator):
         self.value = (a and not b) or (not a and b)
         return self.value
 
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["xor"], 3, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
-
     def replace_with_and_or(self):
         super().replace_with_and_or()
 
@@ -458,15 +438,6 @@ class ImplicationOperator(Operator):
         self.value = not a or b
         return self.value
 
-    def get_truth_table_header(self, depth):
-        res = "("
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += center(operators["implication"], 3, depth)
-        res = res[:-3]
-        res += ")"
-        return res
-
     def replace_with_and_or(self):
         super().replace_with_and_or()
 
@@ -485,16 +456,6 @@ class BiConditionalOperator(Operator):
         b = self.children[1].calculate_value()
         self.value = (a and b) or (not a and not b)
         return self.value
-
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["bi-conditional"], 3, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
 
     def replace_with_and_or(self):
         super().replace_with_and_or()
@@ -548,25 +509,6 @@ class NorOperator(Operator):
         self.value = not any([c.calculate_value() for c in self.children])
         return self.value
 
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["nor"], len(operators["nor"])+2, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
-
-    def get_truth_table_entry(self, depth):
-        res = "("
-        op_str = center(self.value, len(operators["nor"])+2, depth)
-        for child in self.children:
-            res += child.get_truth_table_entry(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
     def replace_with_and_or(self):
         super().replace_with_and_or()
 
@@ -580,26 +522,6 @@ class NandOperator(Operator):
     def calculate_value(self):
         self.value = any([not c.calculate_value() for c in self.children])
         return self.value
-
-    def get_truth_table_header(self, depth):
-        res = "("
-        op_str = center(operators["nand"], len(operators["nand"])+2, depth)
-        for child in self.children:
-            res += child.get_truth_table_header(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
-
-    def get_truth_table_entry(self, depth):
-        res = "("
-        op_str = center(self.value, len(operators["nand"])+2, depth)
-        for child in self.children:
-            res += child.get_truth_table_entry(depth + 1)
-            res += op_str
-        res = res[:-len(op_str)]
-        res += ")"
-        return res
 
     def replace_with_and_or(self):
         super().replace_with_and_or()
