@@ -566,7 +566,24 @@ class NandOperator(Operator):
         return self.value
 
     def get_truth_table_header(self, depth):
-        raise NotImplemented("Fehlt noch")
+        res = "("
+        op_str = center(operators["nand"], len(operators["nand"])+2, depth)
+        for child in self.children:
+            res += child.get_truth_table_header(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
+        res += ")"
+        return res
+
+    def get_truth_table_entry(self, depth):
+        res = "("
+        op_str = center(self.value, len(operators["nand"])+2, depth)
+        for child in self.children:
+            res += child.get_truth_table_entry(depth + 1)
+            res += op_str
+        res = res[:-len(op_str)]
+        res += ")"
+        return res
 
     def replace_with_and_or(self):
         super().replace_with_and_or()
