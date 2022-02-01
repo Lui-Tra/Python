@@ -184,7 +184,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("(x2 ∧ x1 ∧ ¬x0) ∨ (x3 ∧ x2 nand ¬x0)")
+    form = parse("(x2 ∧ x1 ∧ ¬x0) ∨ (x3 ∧ x2 nor ¬x0)")
     print(form)
     form.print_truth_table()
 
