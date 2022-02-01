@@ -13,6 +13,8 @@ class Formula:
         self.variables = variables
 
     def print_truth_table(self):
+        print("print truth table")
+
         variables = [var for var in self.variables.values() if var.name not in ["true", "false"]]
         for var in variables:
             var.value = False

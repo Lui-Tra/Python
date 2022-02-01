@@ -184,9 +184,7 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("(x2 ∧ x1 ∧ ¬x0) ∨ (x3 ∧ x2 ∧ x̄0) ∨ (x̄5 ∧ x3 ∧ x2 ∧ x1) ∨ (x5 ∧ x̄4 ∧ x̄3 ∧ x1) ∨ (x5 ∧ x2 ∧ x̄0) ∨ (x5 ∧ x3 ∧ x̄1 ∧ x0) ∨ (x5 ∧ x̄3 ∧ x1 ∧ x0)")
+    form = parse("(x2 ∧ x1 ∧ ¬x0) ∨ (x3 ∧ x2 ∧ ¬x0)")
     print(form)
-    form.kv(order = ("x0", "x1", "x2","x3","x4","x5"))
-    print(form.simplify())
-    print(form.simple_cnf())
     form.print_truth_table()
+

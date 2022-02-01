@@ -354,7 +354,7 @@ class NotOperator(Operator):
 
 class AndOperator(AndOrOperator):
     def calculate_value(self):
-        self.value = all(c.calculate_value() for c in self.children)
+        self.value = all([c.calculate_value() for c in self.children])
         return self.value
 
     def get_truth_table_header(self, depth):
@@ -389,7 +389,7 @@ class AndOperator(AndOrOperator):
 
 class OrOperator(AndOrOperator):
     def calculate_value(self):
-        self.value = any(c.calculate_value() for c in self.children)
+        self.value = any([c.calculate_value() for c in self.children])
         return self.value
 
     def get_truth_table_header(self, depth):
@@ -545,7 +545,7 @@ class ITEOperator(Operator):
 
 class NorOperator(Operator):
     def calculate_value(self):
-        self.value = not any(c.calculate_value() for c in self.children)
+        self.value = not any([c.calculate_value() for c in self.children])
         return self.value
 
     def get_truth_table_header(self, depth):
@@ -562,7 +562,7 @@ class NorOperator(Operator):
 
 class NandOperator(Operator):
     def calculate_value(self):
-        self.value = any(not c.calculate_value() for c in self.children)
+        self.value = any([not c.calculate_value() for c in self.children])
         return self.value
 
     def get_truth_table_header(self, depth):

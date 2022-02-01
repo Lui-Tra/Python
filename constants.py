@@ -32,8 +32,6 @@ def center(string, size, depth=-1):
         elif not string:
             string = "0"
     if 0 <= depth <= 3:
-        if string is None:
-            string = "?"
         return colored(string.center(size, " "), depth_to_color[depth])
     else:
         return string.center(size, " ")
