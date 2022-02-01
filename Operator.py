@@ -33,7 +33,7 @@ def get_operator_symbol(operator):
         operators["ite"]: ITEOperator,
         operators["nand"]: NandOperator,
         operators["nor"]: NorOperator,
-    }:
+    }.items():
         if isinstance(operator, cls):
             if not current_cls or issubclass(cls, current_cls):
                 current_cls = cls

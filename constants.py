@@ -14,6 +14,9 @@ operators = {
 
 prefix_operators = ("ITE", )
 
+aliases = {
+    "x̄":"¬x",
+}
 
 def center(string, size, depth=-1):
     depth_to_color = {

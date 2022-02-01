@@ -2,6 +2,7 @@ import re
 
 from Formula import Formula
 from constants import operators
+from constants import aliases
 from constants import prefix_operators
 from Operator import get_operator
 from Variable import Variable, TRUE, FALSE
@@ -24,6 +25,7 @@ class Parser:
         return self.variables[name]
 
     def parse(self, formula):
+        formula = self.preproc_aliases(formula)
         formula = self.preproc_names(formula)
         formula = self.preproc_prefix(formula)
         return Formula(self.__parse__(formula), self.variables)
@@ -67,6 +69,14 @@ class Parser:
         sorted_operators = list(operators.items())
         sorted_operators.sort(key=lambda item: len(item[0]), reverse=True)
         for name, symbol in sorted_operators:
+            formula = formula.replace(name, symbol)
+        return formula
+
+    @classmethod
+    def preproc_aliases(cls, formula):
+        sorted_aliases = list(aliases.items())
+        sorted_aliases.sort(key=lambda item: len(item[0]), reverse=True)
+        for name, symbol in sorted_aliases:
             formula = formula.replace(name, symbol)
         return formula
 
@@ -174,8 +184,9 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("(((¬q ∧ ¬t) ∨ (p ∨ t)) ∨ (q ∧ ((¬t ∨ p) ∧ (¬p ∨ t)))) ∨ (((q ∨ t) ∧ (¬p ∧ ¬t)) ∧ (¬q ∨ ((t ∧ ¬p) ∨ (p ∧ ¬t))))")
+    form = parse("(x2 ∧ x1 ∧ ¬x0) ∨ (x3 ∧ x2 ∧ x̄0) ∨ (x̄5 ∧ x3 ∧ x2 ∧ x1) ∨ (x5 ∧ x̄4 ∧ x̄3 ∧ x1) ∨ (x5 ∧ x2 ∧ x̄0) ∨ (x5 ∧ x3 ∧ x̄1 ∧ x0) ∨ (x5 ∧ x̄3 ∧ x1 ∧ x0)")
     print(form)
-    form.kv(order = "tpq")
-    form.kv(order = ("p", "q", "t"))
+    form.kv(order = ("x0", "x1", "x2","x3","x4","x5"))
     print(form.simplify())
+    print(form.simple_cnf())
+    form.print_truth_table()
