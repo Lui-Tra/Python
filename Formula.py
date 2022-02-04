@@ -243,7 +243,7 @@ class Formula:
 
 
     @staticmethod
-    def print_dpll_with_steps(clause_list, assignment):
+    def print_dpll_with_steps(clause_list):
         print(clause_list)
 
         def remove_var(lst, vr):
@@ -260,16 +260,16 @@ class Formula:
 
         if len(clause_list) == 0:
             print("Erfüllbar")
-            return
+            return True
         elif len(clause_list[0]) == 0:
             print("Unerfüllbar")
-            return
+            return False
         else:
             if len(clause_list[0]) == 1:
                 var = clause_list[0][0]
                 print("OLR:", var)
                 remove_var(clause_list, var)
-                Formula.print_dpll_with_steps(clause_list, assignment)
+                Formula.print_dpll_with_steps(clause_list)
             else:
                 all_vars = set()
                 for it in clause_list:
@@ -282,17 +282,24 @@ class Formula:
                     if neg_var not in all_vars:
                         print("PLR:", var)
                         remove_var(clause_list, var)
-                        Formula.print_dpll_with_steps(clause_list, assignment)
+                        Formula.print_dpll_with_steps(clause_list)
                         return
 
                 var = all_vars[0]
-                print("Fallunterscheidung:", var)
+                print("Fallunterscheidung1:", var)
+                clause_list_copy = [[i for i in it] for it in clause_list]
                 remove_var(clause_list, var)
-                Formula.print_dpll_with_steps(clause_list, assignment)
-                return
+                if not Formula.print_dpll_with_steps(clause_list):
+                    neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
+                    print("Fallunterscheidung2:", neg_var)
+                    if not remove_var(clause_list_copy, neg_var):
+                        print("Unerfüllbar")
+                        return False
+                else:
+                    return True
 
     def dpll(self):
-        Formula.print_dpll_with_steps(self.to_clause_list(), {})
+        Formula.print_dpll_with_steps(self.to_clause_list())
 
     def __str__(self):
         return str(self.root)
