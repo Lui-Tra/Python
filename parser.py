@@ -181,7 +181,20 @@ class Parser:
                 return get_operator(seperator, [self.__parse__(token) for token in tokens])
 
     def __parse_knf__(self, formula):
-        return Formula(get_operator("∧", [get_operator("∨", [self.__create_variable__(var) for var in clause.split(",")]) for clause in re.sub(r"\s", "", formula)[2:-2].split("},{")]), self.variables)
+        formula = re.sub(r"\s", "", formula)
+        formula = formula[2:-2]
+        res = []
+        for clause in formula.split("},{"):
+            children = []
+            for var in clause.split(","):
+                if var.startswith("¬"):
+                    children.append(get_operator("¬", self.__create_variable__(var[1:])))
+                else:
+                    children.append(self.__create_variable__(var))
+            res.append(get_operator("∨", children))
+        return Formula(get_operator("∧", res))
+
+
 
 
 def parse(formula):
@@ -189,7 +202,8 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("{{a, b, c}, {d, e, f}, {g, h, i ,j}}")
+    form = parse("{{a, b, c}, {d, e, f}, {g, h, i ,¬j}}")
+    print(type(form.root.children[2].children[3]))
     print(form)
 
 

@@ -210,6 +210,38 @@ class Formula:
         res.sort(key=lambda i: (len(i), i[0] if isinstance(i[0], Variable) else i[0].children[0]))
         return res
 
+    def to_clause_list_f(self):
+        res = []
+        if isinstance(self.root, AndOperator):
+            if all(isinstance(child, OrOperator) for child in self.root.children):
+                for child in self.root.children:
+                    clause = set()
+                    for var in child.children:
+                        if isinstance(var, (Variable, NotOperator)):
+                            clause.add(var)
+                        else:
+                            raise TypeError("Nicht in KNF")
+                    res.append(clause)
+            elif all(isinstance(child, (Variable, NotOperator)) for child in self.root.children):
+                for var in self.root.children:
+                    res.append({var, })
+        return res
+
+    def dpll_f(self):
+        clauses = self.to_clause_list_f()
+        olr_candidate = None
+        olr_candidate_name = ""
+        for clause in clauses:
+            if len(clause) == 1:
+                var = list(clause)[0]
+                var_name = var.name if not isinstance(var, NotOperator) else var.children[0].name
+                print("var name:", var_name)
+
+        print(olr_candidate)
+
+
+
+
     @staticmethod
     def print_dpll_with_steps(clause_list, assignment):
         print(clause_list)
