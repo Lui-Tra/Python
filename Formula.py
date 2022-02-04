@@ -208,6 +208,8 @@ class Formula:
 
     @staticmethod
     def print_dpll_with_steps(clause_list, assignment):
+        print(clause_list)
+
         def remove_var(lst, vr):
             neg_vr = vr.children[0] if isinstance(vr, NotOperator) else NotOperator(vr)
             rem = []
@@ -238,7 +240,7 @@ class Formula:
                     for i in it:
                         all_vars.add(i)
                 all_vars = sorted(list(all_vars))
-                print(all_vars)
+
                 for var in all_vars:
                     neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
                     if neg_var not in all_vars:
