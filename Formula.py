@@ -227,21 +227,6 @@ class Formula:
                     res.append({var, })
         return res
 
-    def dpll_f(self):
-        clauses = self.to_clause_list_f()
-        olr_candidate = None
-        olr_candidate_name = ""
-        for clause in clauses:
-            if len(clause) == 1:
-                var = list(clause)[0]
-                var_name = var.name if not isinstance(var, NotOperator) else var.children[0].name
-                print("var name:", var_name)
-
-        print(olr_candidate)
-
-
-
-
     @staticmethod
     def print_dpll_with_steps(clause_list, assignment):
         print(clause_list)
