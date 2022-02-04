@@ -198,8 +198,12 @@ class Formula:
             for it in self.root.children:
                 if isinstance(it, OrOperator):
                     res.append(sorted(it.children, key=lambda i: i.children[0] if isinstance(i, NotOperator) else i))
+                elif isinstance(it, Variable) or isinstance(it, NotOperator):
+                    res.append(it)
                 else:
                     raise TypeError("Nicht in KNF")
+        elif isinstance(self.root, OrOperator):
+            res = [[it] for it in self.root.children]
         else:
             raise TypeError("Nicht in KNF")
 
