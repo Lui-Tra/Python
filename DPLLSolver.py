@@ -61,29 +61,44 @@ class DPLLSolver:
         if any(len(clause) == 0 for clause in clauses):
             return None
 
-        var_to_remove = get_olr_var(clauses)
-        if var_to_remove is not None:
-            print("olr:",var_to_remove)
-        else:
-            var_to_remove = get_plr_var(clauses)
-            if var_to_remove is not None:
-                print("plr:", var_to_remove)
+        olr_var = get_olr_var(clauses)
+        if olr_var is not None:
+            olr = self.__dpll__(remove_var(clauses, olr_var))
+            return OLRNode(get_base_var(olr_var), not isinstance(olr_var, NotOperator), olr)
 
-        if var_to_remove is not None:
-            new_clauses = remove_var(clauses, var_to_remove)
-            assignment = self.__dpll__(new_clauses)
-            if assignment is None:
-                return None
-            return {get_base_var(var_to_remove).name: not isinstance(var_to_remove, NotOperator)} | assignment
+        plr_var = get_plr_var(clauses)
+        if plr_var is not None:
+            plr = self.__dpll__(remove_var(clauses, plr_var))
+            return PLRNode(get_base_var(plr_var), not isinstance(olr_var, NotOperator), plr)
 
         var = get_first_var(clauses)
+
         ast = self.__dpll__(remove_var(copy_clauses(clauses), var))
-        if ast is not None:
-            return {var: True} | ast
         asf = self.__dpll__(remove_var(copy_clauses(clauses), NotOperator(var)))
-        if asf is not None:
-            return {var: False} | asf
-        return None
+        return DecisionNode(var.name, ast, asf)
+
+
+class DPLLNode:
+    pass
+
+
+class OLRNode(DPLLNode):
+    def __init__(self, name, assignment, nextNode):
+        self.name = name
+        self.assignment = assignment
+        self.nextNode = nextNode
+
+class PLRNode(DPLLNode):
+    def __init__(self, name, assignment, nextNode):
+        self.name = name
+        self.assignment = assignment
+        self.nextNode = nextNode
+
+
+class DecisionNode(DPLLNode):
+    def __init__(self, name, trueNode, falseNode):
+        self.trueNode = trueNode
+        self.falseNode = falseNode
 
 
 if __name__ == "__main__":
