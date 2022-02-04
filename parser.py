@@ -25,6 +25,8 @@ class Parser:
         return self.variables[name]
 
     def parse(self, formula):
+        if formula.startswith("{"):
+            return self.__parse_knf__(formula)
         formula = self.preproc_aliases(formula)
         formula = self.preproc_names(formula)
         formula = self.preproc_prefix(formula)
@@ -178,13 +180,16 @@ class Parser:
             else:
                 return get_operator(seperator, [self.__parse__(token) for token in tokens])
 
+    def __parse_knf__(self, formula):
+        return Formula(get_operator("∧", [get_operator("∨", [self.__create_variable__(var) for var in clause.split(",")]) for clause in re.sub(r"\s", "", formula)[2:-2].split("},{")]), self.variables)
+
 
 def parse(formula):
     return Parser().parse(formula)
 
 
 if __name__ == "__main__":
-    form = parse("ITE(a,b,c)∧d")
+    form = parse("{{a, b, c}, {d, e, f}, {g, h, i ,j}}")
     print(form)
-    form.print_truth_table()
+
 
