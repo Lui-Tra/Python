@@ -1,8 +1,7 @@
 import parser
 
 if __name__ == "__main__":
-    form = parser.parse("a or (not a and b)")
-    form.canonical_cnf()
+    form = parser.parse("a and (not a or b)")
     print(form.to_clause_list())
 
     form.dpll()

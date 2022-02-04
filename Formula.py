@@ -199,7 +199,7 @@ class Formula:
                 if isinstance(it, OrOperator):
                     res.append(sorted(it.children, key=lambda i: i.children[0] if isinstance(i, NotOperator) else i))
                 elif isinstance(it, Variable) or isinstance(it, NotOperator):
-                    res.append(it)
+                    res.append([it])
                 else:
                     raise TypeError("Nicht in KNF")
         elif isinstance(self.root, OrOperator):
