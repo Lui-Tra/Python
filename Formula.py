@@ -288,7 +288,7 @@ class Formula:
                 var = all_vars[0]
                 print("Fallunterscheidung:", var)
                 remove_var(clause_list, var)
-                Formula.print_dpll_with_steps(clause_list, assignment)#
+                Formula.print_dpll_with_steps(clause_list, assignment)
                 return
 
     def dpll(self):
