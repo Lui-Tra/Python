@@ -25,6 +25,12 @@ class Variable(Token):
             return self.name == other.name
         return False
 
+    def __gt__(self, other):
+        return self.name > (other.name if isinstance(other, Variable) else other.children[0].name)
+
+    def __hash__(self):
+        return hash(self.name)
+
     def clone(self):
         return Variable(self.name, self.value)
 

@@ -361,6 +361,12 @@ class NotOperator(Operator):
             return self.children == other.children
         return False
 
+    def __hash__(self):
+        return hash("not " + self.children[0].name)
+
+    def __gt__(self, other):
+        return self.children[0].name > (other.name if isinstance(other, Variable) else other.children[0].name)
+
 
 class AndOperator(AndOrOperator):
     def calculate_value(self):

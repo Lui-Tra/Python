@@ -1,7 +1,9 @@
 import parser
 
 if __name__ == "__main__":
-    form = parser.parse("(A and B and C) or (A and B and (not C) and D)")
-    print(form.canonical_dnf())
-    form.simple_dnf()
-    print(form)
+    form = parser.parse("ITE(z, d, q) xor e and not f")
+    form.simple_cnf()
+    clause_list = form.to_clause_list()
+    print(clause_list)
+
+    form.dpll()
