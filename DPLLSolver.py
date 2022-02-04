@@ -59,7 +59,7 @@ class DPLLSolver:
         if len(clauses) == 0:
             return {}
         if any(len(clause) == 0 for clause in clauses):
-            return None
+            return EmptyNode()
 
         olr_var = get_olr_var(clauses)
         if olr_var is not None:
@@ -82,11 +82,25 @@ class DPLLNode:
     pass
 
 
+class EmptyNode(DPLLNode):
+    def to_partial_string(self):
+        return 1, "{{}}"
+
+    def print(self):
+        print(self)
+
 class OLRNode(DPLLNode):
     def __init__(self, name, assignment, nextNode):
         self.name = name
         self.assignment = assignment
         self.nextNode = nextNode
+
+    def to_partial_string(self):
+        return 0, "X"
+
+    def print(self):
+        print(self)
+        self.nextNode.print()
 
 class PLRNode(DPLLNode):
     def __init__(self, name, assignment, nextNode):
@@ -94,11 +108,27 @@ class PLRNode(DPLLNode):
         self.assignment = assignment
         self.nextNode = nextNode
 
+    def to_partial_string(self):
+        return 0, "X"
+
+    def print(self):
+        print(self)
+        self.nextNode.print()
 
 class DecisionNode(DPLLNode):
     def __init__(self, name, trueNode, falseNode):
         self.trueNode = trueNode
         self.falseNode = falseNode
+
+    # -> anchor, string
+    def to_partial_string(self):
+        left = self.trueNode.to_partial_string()
+        right = self.trueNode.to_partial_string()
+
+    def print(self):
+        print(self)
+        self.trueNode.print()
+        self.falseNode.print()
 
 
 if __name__ == "__main__":
@@ -106,4 +136,4 @@ if __name__ == "__main__":
     print(form)
     cl = form.to_clause_list_f()
     dpll = DPLLSolver(cl)
-    print(dpll.__dpll__(cl))
+    print(dpll.__dpll__(cl).print())
