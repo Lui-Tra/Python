@@ -89,6 +89,7 @@ class EmptyNode(DPLLNode):
     def print(self):
         print(self)
 
+
 class OLRNode(DPLLNode):
     def __init__(self, name, assignment, nextNode):
         self.name = name
@@ -102,6 +103,7 @@ class OLRNode(DPLLNode):
         print(self)
         self.nextNode.print()
 
+
 class PLRNode(DPLLNode):
     def __init__(self, name, assignment, nextNode):
         self.name = name
@@ -114,6 +116,7 @@ class PLRNode(DPLLNode):
     def print(self):
         print(self)
         self.nextNode.print()
+
 
 class DecisionNode(DPLLNode):
     def __init__(self, name, trueNode, falseNode):

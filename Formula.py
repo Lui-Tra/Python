@@ -227,64 +227,8 @@ class Formula:
                     res.append({var, })
         return res
 
-    @staticmethod
-    def print_dpll_with_steps(clause_list):
-        print(clause_list)
-
-        def remove_var(lst, vr):
-            neg_vr = vr.children[0] if isinstance(vr, NotOperator) else NotOperator(vr)
-            rem = []
-            lst.remove(lst[0])
-            for item in lst:
-                if vr in item:
-                    rem.append(item)
-                elif neg_vr in item:
-                    item.remove(neg_vr)
-            for item in rem:
-                lst.remove(item)
-
-        if len(clause_list) == 0:
-            print("Erfüllbar")
-            return True
-        elif len(clause_list[0]) == 0:
-            print("Unerfüllbar")
-            return False
-        else:
-            if len(clause_list[0]) == 1:
-                var = clause_list[0][0]
-                print("OLR:", var)
-                remove_var(clause_list, var)
-                Formula.print_dpll_with_steps(clause_list)
-            else:
-                all_vars = set()
-                for it in clause_list:
-                    for i in it:
-                        all_vars.add(i)
-                all_vars = sorted(list(all_vars))
-
-                for var in all_vars:
-                    neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
-                    if neg_var not in all_vars:
-                        print("PLR:", var)
-                        remove_var(clause_list, var)
-                        Formula.print_dpll_with_steps(clause_list)
-                        return
-
-                var = all_vars[0]
-                print("Fallunterscheidung1:", var)
-                clause_list_copy = [[i for i in it] for it in clause_list]
-                remove_var(clause_list, var)
-                if not Formula.print_dpll_with_steps(clause_list):
-                    neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
-                    print("Fallunterscheidung2:", neg_var)
-                    if not remove_var(clause_list_copy, neg_var):
-                        print("Unerfüllbar")
-                        return False
-                else:
-                    return True
-
     def dpll(self):
-        Formula.print_dpll_with_steps(self.to_clause_list())
+        print("fehlt")
 
     def __str__(self):
         return str(self.root)
