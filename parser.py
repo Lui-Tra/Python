@@ -204,6 +204,7 @@ def parse(formula):
 if __name__ == "__main__":
     form = parse("{{D,A,B},{D,A},{D,A,C}}")
     print(list(e.name for e in form.root.children[0].children))
+    form.simple_cnf()
     form.print_truth_table()
 
 
