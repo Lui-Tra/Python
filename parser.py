@@ -192,7 +192,7 @@ class Parser:
                 else:
                     children.append(self.__create_variable__(var))
             res.append(get_operator("∨", children))
-        return Formula(get_operator("∧", res))
+        return Formula(get_operator("∧", res), variables=self.variables)
 
 
 
@@ -202,8 +202,8 @@ def parse(formula):
 
 
 if __name__ == "__main__":
-    form = parse("{{a, b, c}, {d, e, f}, {g, h, i ,¬j}}")
-    print(type(form.root.children[2].children[3]))
-    print(form)
+    form = parse("{{D,A,B},{D,A},{D,A,C}}")
+    print(list(e.name for e in form.root.children[0].children))
+    form.print_truth_table()
 
 
