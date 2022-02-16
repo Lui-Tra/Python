@@ -12,37 +12,40 @@ class Formula:
         self.root = root
         self.variables = variables
 
-    def print_truth_table(self):
-        print("print truth table")
+    def print_truth_table(self, order = None):
+        print("print truth table", order)
 
-        variables = [var for var in self.variables.values() if var.name not in ["true", "false"]]
-        for var in variables:
+        variable_dict = {var.name:var for var in self.variables.values() if var.name not in ["true", "false"]}
+        order = order or [name for name in variable_dict]
+        ordered = [variable_dict[name] for name in order]
+
+        for var in ordered:
             var.value = False
 
-        self.print_table_header()
+        self.print_table_header(ordered)
 
         self.root.calculate_value()
-        self.print_values()
+        self.print_values(ordered)
 
-        for i in range(2 ** len(variables) - 1):
+        for i in range(2 ** len(ordered) - 1):
             index = -1
-            while index < 0 and variables[index].value:
-                variables[index].value = False
+            while index < 0 and ordered[index].value:
+                ordered[index].value = False
                 index -= 1
             if index <= 0:
-                variables[index].value = True
+                ordered[index].value = True
 
             self.root.calculate_value()
-            self.print_values()
+            self.print_values(ordered)
 
-    def print_table_header(self):
-        for name in self.variables:
+    def print_table_header(self, ordered = None):
+        for name in ordered or self.variables:
             print(name, end=" | ")
         print(self.root.get_truth_table_header(0))
 
-    def print_values(self):
-        for name, var in self.variables.items():
-            val = center(str(int(var.value)), len(name))
+    def print_values(self, ordered = None):
+        for var in ordered or self.variables.values():
+            val = center(str(int(var.value)), len(var.name))
             print(val, end=" | ")
         print(self.root.get_truth_table_entry(0))
 
@@ -72,19 +75,22 @@ class Formula:
     def get_values(self):
         return {name: var.value for name, var in self.variables.items()}
 
-    def get_truth_table(self):
-        variables = [var for var in self.variables.values() if var.name not in ["true", "false"]]
-        for var in variables:
+    def get_truth_table(self, order = None):
+        variable_dict = {var.name:var for var in self.variables.values() if var.name not in ["true", "false"]}
+        order = order or [name for name in variable_dict]
+        ordered = [variable_dict[name] for name in order]
+
+        for var in ordered:
             var.value = False
         yield self.get_values(), self.root.calculate_value()
-        for i in range(2 ** len(variables) - 1):
+        for i in range(2 ** len(ordered) - 1):
 
             index = -1
-            while index < 0 and variables[index].value:
-                variables[index].value = False
+            while index < 0 and ordered[index].value:
+                ordered[index].value = False
                 index -= 1
             if index <= 0:
-                variables[index].value = True
+                ordered[index].value = True
             yield self.get_values(), self.root.calculate_value()
 
     def canonical_dnf(self):
