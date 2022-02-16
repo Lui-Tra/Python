@@ -29,6 +29,20 @@ class ZSternGruppe:
     def mul(self, a, b):
         return (a * b) % self.n
 
+    def inverses(self, a):
+        inv, _ = _eea(a, self.n)
+        return inv % self.n
+
+    def pow(self, a, b):
+        if b < 0:
+            a = self.inverses(a)
+            b = -b
+
+        res = 1
+        for i in range(b):
+            res = self.mul(res, a)
+        return res
+
 
 def ggT(a, b):
     if a == 0:
@@ -80,5 +94,6 @@ def _eea(a, b):
 
 
 if __name__ == '__main__':
-    z = ZSternGruppe(71)
-    print(z.erzeuger())
+    g = ZSternGruppe(1383)
+    print(g.pow(860, 917))
+    print(g.inverses(860))
