@@ -43,7 +43,8 @@ def __generate_kv__(variables, current_variables):
             return mirror_kv_v(prev_kv, new_var)
 
 
-def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_width=3, side_distance=150):
+def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_width=3, side_distance=150,
+                       color=(255, 0, 0)):
     pygame.init()
 
     width = (side_distance * 2 + border_width + (block_width + border_width) * len(diagramm[0])) * scale
@@ -57,7 +58,7 @@ def render_kv_diagramm(diagramm, variables, scale=1, block_width=50, border_widt
                 pygame.quit()
                 return
         screen.fill("#ffffff")
-        render_cells(diagramm, screen, scale, block_width, border_width, side_distance)
+        render_cells(diagramm, screen, scale, block_width, border_width, side_distance, color)
         render_names(variables, screen, scale, block_width, border_width, side_distance)
         clock.tick(60)
         pygame.display.flip()
@@ -101,7 +102,8 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
 
                 pygame.draw.line(screen, color,
                                  (start_x, y),
-                                 (end_x, y)
+                                 (end_x, y),
+                                 5
                                  )
 
                 draw_centered_text(screen, (start_x + (end_x - start_x) // 2, y - 15 * scale), var, scale)
@@ -129,13 +131,14 @@ def render_names(variables, screen, scale=1, block_width=50, border_width=3, sid
 
                 pygame.draw.line(screen, color,
                                  (x, start_y),
-                                 (x, end_y)
+                                 (x, end_y),
+                                 5
                                  )
 
                 draw_text(screen, (x - 15 * scale, start_y + (end_y - start_y) // 2), var, scale)
 
 
-def render_cells(diagramm, screen, scale=1, block_width=50, border_width=3, side_distance=150):
+def render_cells(diagramm, screen, scale=1, block_width=50, border_width=3, side_distance=150, cell_color=(255, 0, 0)):
     for row in range(len(diagramm)):
         for col in range(len(diagramm[0])):
             pygame.draw.rect(screen,
@@ -146,7 +149,7 @@ def render_cells(diagramm, screen, scale=1, block_width=50, border_width=3, side
                               scale * (block_width + 2 * border_width)]
                              )
 
-            color = "red" if diagramm[row][col] else "white"
+            color = cell_color if diagramm[row][col] else "white"
             pygame.draw.rect(screen,
                              color,
                              [scale * (side_distance + border_width + col * (border_width + block_width)),

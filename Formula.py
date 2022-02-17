@@ -187,7 +187,7 @@ class Formula:
         for key, value in values.items():
             self.variables[key].value = value
 
-    def kv(self, scale=1, order=None):
+    def kv(self, scale=1, order=None, color=(255, 0, 0)):
         values = generate_kv(order or list(self.variables.keys()))
         matrix = []
         for row in values:
@@ -197,7 +197,7 @@ class Formula:
                 val = self.root.calculate_value()
                 new_row.append(val)
             matrix.append(new_row)
-        KVGenerator.render_kv_diagramm(matrix, order or list(self.variables.keys()), scale=scale)
+        KVGenerator.render_kv_diagramm(matrix, order or list(self.variables.keys()), scale=scale, color=color)
 
     def to_clause_list(self):
         res = []
