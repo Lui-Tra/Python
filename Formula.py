@@ -197,7 +197,7 @@ class Formula:
                 val = self.root.calculate_value()
                 new_row.append(val)
             matrix.append(new_row)
-        kv_generator.render_kv_diagramm(matrix, order or list(self.variables.keys()), scale=scale)
+        KVGenerator.render_kv_diagramm(matrix, order or list(self.variables.keys()), scale=scale)
 
     def to_clause_list(self):
         res = []

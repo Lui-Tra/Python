@@ -30,7 +30,7 @@ Mittels pygame kann ein KV-Diagramm ausgegeben werden.
 ```python
 formel.kv(
     scale=2,                # scale 2 für HiDPI Bildschirme
-    order=["a", "b", "c"]   # irgendein Iterable, das angibt, in welcher Reihenfolge 
+    order="abc"             # irgendein Iterable, das angibt, in welcher Reihenfolge 
                             # die Variablen angezeigt werden sollen.
 )
 ```
