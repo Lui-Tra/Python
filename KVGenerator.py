@@ -8,8 +8,8 @@ def mirror_kv_h(kv, new_var):
     res = kv
     for i, line in enumerate(kv):
         new_line = []
-        for vars in line:
-            new_vars = dict(vars)
+        for it in line:
+            new_vars = dict(it)
             new_vars[new_var] = True
             new_line.append(new_vars)
         res[i] += reversed(new_line)
@@ -20,10 +20,10 @@ def mirror_kv_v(kv, new_var):
     res = kv
     for line in reversed(kv):
         new_line = []
-        for vars in line:
-            new_vars = dict(vars)
+        for it in line:
+            new_vars = dict(it)
             new_vars[new_var] = 1
-            new_line.append(vars | {new_var: True})
+            new_line.append(it | {new_var: True})
         res.append(new_line)
     return res
 

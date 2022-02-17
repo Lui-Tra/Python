@@ -1,8 +1,8 @@
-import kv_generator
+import KVGenerator
 from Operator import NotOperator, AndOperator, OrOperator
 from Variable import Variable
 from DPLLSolver import create_dpll_tree, display_dpll_tree
-from kv_generator import generate_kv
+from KVGenerator import generate_kv
 from util import center
 
 
