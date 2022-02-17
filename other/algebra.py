@@ -1,3 +1,6 @@
+import math
+
+
 class ZSternGruppe:
     def __init__(self, n):
         self.n = n
@@ -43,6 +46,12 @@ class ZSternGruppe:
             res = self.mul(res, a)
         return res
 
+    def gruppenexponent(self):
+        exp = set()
+        for it in self.elements:
+            exp.add(self.ord(it))
+        return math.lcm(*exp)
+
 
 def ggT(a, b):
     if a == 0:
@@ -51,6 +60,10 @@ def ggT(a, b):
         return ggT(a % b, b)
     else:
         return ggT(b % a, a)
+
+
+def kgV(a, b):
+    return math.lcm(a, b)
 
 
 def primfaktoren(n):
@@ -94,6 +107,7 @@ def _eea(a, b):
 
 
 if __name__ == '__main__':
-    g = ZSternGruppe(1383)
-    print(g.pow(860, 917))
-    print(g.inverses(860))
+    g = ZSternGruppe(9991)
+    a = 373065
+    b = 746130
+    eea(a, 13)

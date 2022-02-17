@@ -135,7 +135,7 @@ class DecisionNode(DPLLNode):
 
 
 if __name__ == "__main__":
-    form = parser.parse("{{q,r,¬x},{¬q,r},{¬q,¬x},{r,x},{¬r,x},{¬r,¬x}}")
+    form = parser.parse("{{p, ¬r},{p, ¬q},{r, q},{¬r, ¬q},{q, ¬p},{r, ¬q, ¬p},{r, q, p}}")
     print(form)
     cl = form.to_clause_list_f()
     dpll = DPLLSolver(cl)

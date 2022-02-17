@@ -1,5 +1,5 @@
 from Token import Token
-from constants import center
+from util import center
 
 
 class Variable(Token):

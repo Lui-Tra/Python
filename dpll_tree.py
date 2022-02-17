@@ -1,5 +1,6 @@
 import pygame
 
+import parser
 from Operator import NotOperator
 
 
@@ -121,12 +122,8 @@ def create_dpll_tree(clause_list):
             text = str(clause_list)
 
             clause_list_copy = [[i for i in it] for it in clause_list]
-            print(clause_list)
             remove_var(clause_list, var)
             remove_var(clause_list_copy, neg_var)
-
-            print(clause_list)
-            print(clause_list_copy)
 
             if isinstance(var, NotOperator):
                 case1 = DpllNode(str(neg_var) + ":= true", [create_dpll_tree(clause_list_copy)])
@@ -135,3 +132,13 @@ def create_dpll_tree(clause_list):
                 case1 = DpllNode(str(var) + ":= true", [create_dpll_tree(clause_list)])
                 case2 = DpllNode(str(var) + ":= false", [create_dpll_tree(clause_list_copy)])
             return DpllNode(text, [case1, case2])
+
+
+def dpll_from_string(string, scale=1):
+    form = parser.parse(string)
+    root = create_dpll_tree(form.to_clause_list())
+    display_dpll_tree(root, scale)
+
+
+if __name__ == '__main__':
+    dpll_from_string("{{p, ¬r},{p, ¬q},{r, q},{¬r, ¬q},{q, ¬p},{r, ¬q, ¬p},{r, q, p}}", scale=2)

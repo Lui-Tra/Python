@@ -1,8 +1,8 @@
 import kv_generator
 from Operator import NotOperator, AndOperator, OrOperator
 from Variable import Variable
-from constants import center
-from kv_generator import generate_kv, render_kv_diagramm
+from kv_generator import generate_kv
+from util import center
 
 
 class Formula:
@@ -12,10 +12,10 @@ class Formula:
         self.root = root
         self.variables = variables
 
-    def print_truth_table(self, order = None):
+    def print_truth_table(self, order=None):
         print("print truth table", order)
 
-        variable_dict = {var.name:var for var in self.variables.values() if var.name not in ["true", "false"]}
+        variable_dict = {var.name: var for var in self.variables.values() if var.name not in ["true", "false"]}
         order = order or [name for name in variable_dict]
         ordered = [variable_dict[name] for name in order]
 
@@ -38,12 +38,12 @@ class Formula:
             self.root.calculate_value()
             self.print_values(ordered)
 
-    def print_table_header(self, ordered = None):
+    def print_table_header(self, ordered=None):
         for name in ordered or self.variables:
             print(name, end=" | ")
         print(self.root.get_truth_table_header(0))
 
-    def print_values(self, ordered = None):
+    def print_values(self, ordered=None):
         for var in ordered or self.variables.values():
             val = center(str(int(var.value)), len(var.name))
             print(val, end=" | ")
@@ -75,8 +75,8 @@ class Formula:
     def get_values(self):
         return {name: var.value for name, var in self.variables.items()}
 
-    def get_truth_table(self, order = None):
-        variable_dict = {var.name:var for var in self.variables.values() if var.name not in ["true", "false"]}
+    def get_truth_table(self, order=None):
+        variable_dict = {var.name: var for var in self.variables.values() if var.name not in ["true", "false"]}
         order = order or [name for name in variable_dict]
         ordered = [variable_dict[name] for name in order]
 

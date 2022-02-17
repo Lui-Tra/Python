@@ -1,11 +1,10 @@
 import re
 
 from Formula import Formula
-from constants import operators
-from constants import aliases
+from constants import aliases, operators
 from constants import prefix_operators
 from Operator import get_operator
-from Variable import Variable, TRUE, FALSE
+from Variable import Variable
 import Variable as Variables
 
 
@@ -195,8 +194,6 @@ class Parser:
         return Formula(get_operator("∧", res), variables=self.variables)
 
 
-
-
 def parse(formula):
     return Parser().parse(formula)
 
@@ -204,6 +201,4 @@ def parse(formula):
 if __name__ == "__main__":
     form = parse("{{D,A,B},{D,A},{D,A,C}}")
     print(list(e.name for e in form.root.children[0].children))
-    form.print_truth_table(order = "ABCD")
-
-
+    form.print_truth_table(order="ABCD")

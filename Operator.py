@@ -2,8 +2,8 @@ from abc import ABC
 
 from Token import Token
 from Variable import FALSE, TRUE, Variable
-from constants import operators, center
-from debugging import indented_print
+from constants import operators
+from util import center
 
 
 def get_operator(operator_name, children):
