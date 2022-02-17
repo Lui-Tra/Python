@@ -7,33 +7,13 @@ from util import center
 
 
 def get_operator(operator_name, children):
-    return {
-        operators["not"]: NotOperator,
-        operators["and"]: AndOperator,
-        operators["or"]: OrOperator,
-        operators["xor"]: XorOperator,
-        operators["implication"]: ImplicationOperator,
-        operators["bi-conditional"]: BiConditionalOperator,
-        operators["ite"]: ITEOperator,
-        operators["nand"]: NandOperator,
-        operators["nor"]: NorOperator,
-    }[operator_name](children)
+    return operator_classes[operator_name](children)
 
 
 def get_operator_symbol(operator):
     res = "?"
     current_cls = None
-    for symbol, cls in {
-        operators["not"]: NotOperator,
-        operators["and"]: AndOperator,
-        operators["or"]: OrOperator,
-        operators["xor"]: XorOperator,
-        operators["implication"]: ImplicationOperator,
-        operators["bi-conditional"]: BiConditionalOperator,
-        operators["ite"]: ITEOperator,
-        operators["nand"]: NandOperator,
-        operators["nor"]: NorOperator,
-    }.items():
+    for symbol, cls in operator_classes.items():
         if isinstance(operator, cls):
             if not current_cls or issubclass(cls, current_cls):
                 current_cls = cls
@@ -221,7 +201,8 @@ class AndOrOperator(Operator, ABC):
                                 absolutely_new_children.append(it)
 
         new_children = [child for child in self.children if isinstance(child, Variable) or len(child.children) != 0]
-        new_children_2 = [child if isinstance(child, Variable) or len(child.children) != 1 else child.children[0] for child in new_children]
+        new_children_2 = [child if isinstance(child, Variable) or len(child.children) != 1 else child.children[0]
+                          for child in new_children]
 
         if len(absolutely_new_children) > 0:
             if isinstance(self, OrOperator):
@@ -537,4 +518,15 @@ class NandOperator(Operator):
     def __str__(self):
         return self.multiple_traverse(operators["nand"])
 
-# TODO: nur nand oder nor
+
+operator_classes = {
+    operators["not"]: NotOperator,
+    operators["and"]: AndOperator,
+    operators["or"]: OrOperator,
+    operators["xor"]: XorOperator,
+    operators["implication"]: ImplicationOperator,
+    operators["bi-conditional"]: BiConditionalOperator,
+    operators["ite"]: ITEOperator,
+    operators["nand"]: NandOperator,
+    operators["nor"]: NorOperator,
+}

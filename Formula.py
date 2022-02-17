@@ -1,6 +1,7 @@
 import kv_generator
 from Operator import NotOperator, AndOperator, OrOperator
 from Variable import Variable
+from DPLLSolver import create_dpll_tree, display_dpll_tree
 from kv_generator import generate_kv
 from util import center
 
@@ -15,12 +16,7 @@ class Formula:
     def print_truth_table(self, order=None):
         print("print truth table", order)
 
-        variable_dict = {var.name: var for var in self.variables.values() if var.name not in ["true", "false"]}
-        order = order or [name for name in variable_dict]
-        ordered = [variable_dict[name] for name in order]
-
-        for var in ordered:
-            var.value = False
+        ordered = self.ordered_variables(order)
 
         self.print_table_header(ordered)
 
@@ -75,16 +71,22 @@ class Formula:
     def get_values(self):
         return {name: var.value for name, var in self.variables.items()}
 
-    def get_truth_table(self, order=None):
+    def ordered_variables(self, order):
         variable_dict = {var.name: var for var in self.variables.values() if var.name not in ["true", "false"]}
         order = order or [name for name in variable_dict]
         ordered = [variable_dict[name] for name in order]
 
         for var in ordered:
             var.value = False
-        yield self.get_values(), self.root.calculate_value()
-        for i in range(2 ** len(ordered) - 1):
 
+        return ordered
+
+    def get_truth_table(self, order=None):
+        ordered = self.ordered_variables(order)
+
+        yield self.get_values(), self.root.calculate_value()
+
+        for i in range(2 ** len(ordered) - 1):
             index = -1
             while index < 0 and ordered[index].value:
                 ordered[index].value = False
@@ -181,8 +183,8 @@ class Formula:
     def clone(self):
         return Formula(self.root.clone())
 
-    def set_values(self, dict):
-        for key, value in dict.items():
+    def set_values(self, values):
+        for key, value in values.items():
             self.variables[key].value = value
 
     def kv(self, scale=1, order=None):
@@ -233,8 +235,9 @@ class Formula:
                     res.append({var, })
         return res
 
-    def dpll(self):
-        print("fehlt")
+    def dpll(self, scale=1):
+        root = create_dpll_tree(self.to_clause_list())
+        display_dpll_tree(root, scale)
 
     def __str__(self):
         return str(self.root)

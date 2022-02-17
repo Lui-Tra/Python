@@ -1,142 +1,139 @@
-from Operator import NotOperator
+import pygame
+
 import parser
+from Operator import NotOperator
 
 
-def copy_clauses(clauses):
-    return [set(clause) for clause in clauses]
+class DpllNode:
+    def __init__(self, text, children=None):
+        if children is None:
+            children = []
+        self.text = text.replace("[", "{").replace("]", "}")
+        self.children = children
+        self.render_text = None
+
+    def traverse(self, indent=0):
+        print(" " * (indent * 2) + self.text)
+        for c in self.children:
+            c.traverse(indent + 1)
+
+    def display(self):
+        pass
+
+    def render_texts(self, font):
+        if self.render_text is None:
+            self.render_text = font.render(self.text, (0, 0, 0))
+        for c in self.children:
+            c.render_texts(font)
+
+    def depth(self):
+        if len(self.children) == 0:
+            return 1
+        return max([c.depth() for c in self.children]) + 1
+
+    def display_draw(self, screen, pos, h_spacer, width):
+        screen.blit(self.render_text[0], (pos[0] - self.render_text[1].width // 2, pos[1]))
+        if len(self.children) == 1:
+            pygame.draw.line(screen, (0, 0, 0),
+                             (pos[0], pos[1] + h_spacer * 0.25),
+                             (pos[0], pos[1] + h_spacer * 0.9),
+                             6)
+            self.children[0].display_draw(screen, (pos[0], pos[1] + h_spacer), h_spacer, width)
+        elif len(self.children) == 2:
+            pygame.draw.line(screen, (0, 0, 0),
+                             (pos[0], pos[1] + h_spacer * 0.25),
+                             (pos[0] - width // 4, pos[1] + h_spacer * 0.9),
+                             6)
+            pygame.draw.line(screen, (0, 0, 0),
+                             (pos[0], pos[1] + h_spacer * 0.25),
+                             (pos[0] + width // 4, pos[1] + h_spacer * 0.9),
+                             6)
+            self.children[0].display_draw(screen, (pos[0] - width // 4, pos[1] + h_spacer), h_spacer, width // 2)
+            self.children[1].display_draw(screen, (pos[0] + width // 4, pos[1] + h_spacer), h_spacer, width // 2)
 
 
-def get_base_var(var):
-    return var.children[0] if isinstance(var, NotOperator) else var
+def display_dpll_tree(root, scale=1, w=1000):
+    pygame.init()
+    clock = pygame.time.Clock()
+
+    w *= scale
+
+    h_spacer = 75 * scale
+
+    font = pygame.freetype.SysFont("Segoe UI", 15 * scale)
+    root.render_texts(font)
+
+    h = root.depth() * h_spacer + h_spacer * scale
+
+    screen = pygame.display.set_mode((w, h))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        screen.fill((255, 255, 255))
+
+        root.display_draw(screen, (w // 2, h_spacer), h_spacer, w)
+
+        pygame.display.update()
+        clock.tick(30)
 
 
-def negate_var(var):
-    return var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
+def create_dpll_tree(clause_list):
+    def remove_var(lst, vr):
+        neg_vr = vr.children[0] if isinstance(vr, NotOperator) else NotOperator(vr)
+        rem = []
+        for item in lst:
+            if vr in item:
+                rem.append(item)
+            elif neg_vr in item:
+                item.remove(neg_vr)
+        for item in rem:
+            lst.remove(item)
 
-
-def remove_var(clauses, var):
-    clauses = [clause for clause in clauses if var not in clause]
-    neg_var = negate_var(var)
-    for clause in clauses:
-        if neg_var in clause:
-            clause.remove(neg_var)
-    return clauses
-
-
-def get_olr_var(clauses):
-    olr_var = None
-    base_olr_var = None
-    for clause in clauses:
-        if len(clause) == 1:
-            var = list(clause)[0]
-            base_var = get_base_var(var)
-            if base_olr_var is None or base_var.name < base_olr_var.name:
-                olr_var = var
-                base_olr_var = base_var
-    return olr_var
-
-
-def get_plr_var(clauses):
-    variables = {var for clause in clauses for var in clause}
-    plr_var_candidates = sorted(
-        [var for var in variables if not (var in variables and negate_var(var) in variables)],
-        key=lambda var: get_base_var(var).name)
-    if len(plr_var_candidates) > 0:
-        return plr_var_candidates[0]
+    if len(clause_list) == 0:
+        return DpllNode("Erfüllbar")
+    elif len(clause_list[0]) == 0:
+        return DpllNode("Unerfüllbar")
     else:
-        return None
+        if len(clause_list[0]) == 1:
+            var = clause_list[0][0]
+            text = str(clause_list)
+            remove_var(clause_list, var)
+            return DpllNode(text, [DpllNode("OLR: " + str(var) + " := true", [create_dpll_tree(clause_list)])])
+        else:
+            all_vars = set()
+            for it in clause_list:
+                for i in it:
+                    all_vars.add(i)
+            all_vars = sorted(list(all_vars))
+
+            for var in all_vars:
+                neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
+                if neg_var not in all_vars:
+                    text = str(clause_list)
+                    remove_var(clause_list, var)
+                    return DpllNode(text, [DpllNode("PLR: " + str(var) + " := true", [create_dpll_tree(clause_list)])])
+
+            var = all_vars[0]
+            neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
+
+            text = str(clause_list)
+
+            clause_list_copy = [[i for i in it] for it in clause_list]
+            remove_var(clause_list, var)
+            remove_var(clause_list_copy, neg_var)
+
+            if isinstance(var, NotOperator):
+                case1 = DpllNode(str(neg_var) + ":= true", [create_dpll_tree(clause_list_copy)])
+                case2 = DpllNode(str(neg_var) + ":= false", [create_dpll_tree(clause_list)])
+            else:
+                case1 = DpllNode(str(var) + ":= true", [create_dpll_tree(clause_list)])
+                case2 = DpllNode(str(var) + ":= false", [create_dpll_tree(clause_list_copy)])
+            return DpllNode(text, [case1, case2])
 
 
-def get_first_var(clauses):
-    return sorted({get_base_var(var) for clause in clauses for var in clause}, key=lambda var: var.name)[0]
-
-
-class DPLLSolver:
-    def __init__(self, clauses):
-        self.clauses = clauses
-
-    def __dpll__(self, clauses):
-        if len(clauses) == 0:
-            return {}
-        if any(len(clause) == 0 for clause in clauses):
-            return EmptyNode()
-
-        olr_var = get_olr_var(clauses)
-        if olr_var is not None:
-            olr = self.__dpll__(remove_var(clauses, olr_var))
-            return OLRNode(get_base_var(olr_var), not isinstance(olr_var, NotOperator), olr)
-
-        plr_var = get_plr_var(clauses)
-        if plr_var is not None:
-            plr = self.__dpll__(remove_var(clauses, plr_var))
-            return PLRNode(get_base_var(plr_var), not isinstance(olr_var, NotOperator), plr)
-
-        var = get_first_var(clauses)
-
-        ast = self.__dpll__(remove_var(copy_clauses(clauses), var))
-        asf = self.__dpll__(remove_var(copy_clauses(clauses), NotOperator(var)))
-        return DecisionNode(var.name, ast, asf)
-
-
-class DPLLNode:
-    pass
-
-
-class EmptyNode(DPLLNode):
-    def to_partial_string(self):
-        return 1, "{{}}"
-
-    def print(self):
-        print(self)
-
-
-class OLRNode(DPLLNode):
-    def __init__(self, name, assignment, nextNode):
-        self.name = name
-        self.assignment = assignment
-        self.nextNode = nextNode
-
-    def to_partial_string(self):
-        return 0, "X"
-
-    def print(self):
-        print(self)
-        self.nextNode.print()
-
-
-class PLRNode(DPLLNode):
-    def __init__(self, name, assignment, nextNode):
-        self.name = name
-        self.assignment = assignment
-        self.nextNode = nextNode
-
-    def to_partial_string(self):
-        return 0, "X"
-
-    def print(self):
-        print(self)
-        self.nextNode.print()
-
-
-class DecisionNode(DPLLNode):
-    def __init__(self, name, trueNode, falseNode):
-        self.trueNode = trueNode
-        self.falseNode = falseNode
-
-    # -> anchor, string
-    def to_partial_string(self):
-        left = self.trueNode.to_partial_string()
-        right = self.trueNode.to_partial_string()
-
-    def print(self):
-        print(self)
-        self.trueNode.print()
-        self.falseNode.print()
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     form = parser.parse("{{p, ¬r},{p, ¬q},{r, q},{¬r, ¬q},{q, ¬p},{r, ¬q, ¬p},{r, q, p}}")
-    print(form)
-    cl = form.to_clause_list_f()
-    dpll = DPLLSolver(cl)
-    print(dpll.__dpll__(cl).print())
+    form.dpll(2)

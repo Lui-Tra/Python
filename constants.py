@@ -1,5 +1,3 @@
-from termcolor import colored
-
 operators = {
     "not": "¬",
     "and": "∧",
@@ -12,8 +10,8 @@ operators = {
     "nor": "NOR",
 }
 
-prefix_operators = ("ITE", )
+prefix_operators = ("ITE",)
 
 aliases = {
-    "x̄":"¬x",
+    "x̄": "¬x",
 }
