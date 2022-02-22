@@ -107,7 +107,6 @@ def _eea(a, b):
 
 
 if __name__ == '__main__':
-    g = ZSternGruppe(9991)
-    a = 373065
-    b = 746130
-    eea(a, 13)
+    g = ZSternGruppe(83)
+    print(264 % 83)
+    print(245 % 82)

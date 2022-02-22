@@ -17,9 +17,6 @@ class DpllNode:
         for c in self.children:
             c.traverse(indent + 1)
 
-    def display(self):
-        pass
-
     def render_texts(self, font):
         if self.render_text is None:
             self.render_text = font.render(self.text, (0, 0, 0))
@@ -80,7 +77,7 @@ def display_dpll_tree(root, scale=1, w=1000):
         clock.tick(30)
 
 
-def create_dpll_tree(clause_list):
+def create_dpll_tree(clause_list, plr_allowed=True):
     def remove_var(lst, vr):
         neg_vr = vr.children[0] if isinstance(vr, NotOperator) else NotOperator(vr)
         rem = []
@@ -101,7 +98,10 @@ def create_dpll_tree(clause_list):
             var = clause_list[0][0]
             text = str(clause_list)
             remove_var(clause_list, var)
-            return DpllNode(text, [DpllNode("OLR: " + str(var) + " := true", [create_dpll_tree(clause_list)])])
+            return DpllNode(text,
+                            [DpllNode("OLR: " + str(var) + " := true",
+                                      [create_dpll_tree(clause_list, plr_allowed)])]
+                            )
         else:
             all_vars = set()
             for it in clause_list:
@@ -109,12 +109,15 @@ def create_dpll_tree(clause_list):
                     all_vars.add(i)
             all_vars = sorted(list(all_vars))
 
-            for var in all_vars:
-                neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
-                if neg_var not in all_vars:
-                    text = str(clause_list)
-                    remove_var(clause_list, var)
-                    return DpllNode(text, [DpllNode("PLR: " + str(var) + " := true", [create_dpll_tree(clause_list)])])
+            if plr_allowed:
+                for var in all_vars:
+                    neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
+                    if neg_var not in all_vars:
+                        text = str(clause_list)
+                        remove_var(clause_list, var)
+                        return DpllNode(text,
+                                        [DpllNode("PLR: " + str(var) + " := true",
+                                                  [create_dpll_tree(clause_list, plr_allowed)])])
 
             var = all_vars[0]
             neg_var = var.children[0] if isinstance(var, NotOperator) else NotOperator(var)
@@ -126,11 +129,11 @@ def create_dpll_tree(clause_list):
             remove_var(clause_list_copy, neg_var)
 
             if isinstance(var, NotOperator):
-                case1 = DpllNode(str(neg_var) + ":= true", [create_dpll_tree(clause_list_copy)])
-                case2 = DpllNode(str(neg_var) + ":= false", [create_dpll_tree(clause_list)])
+                case1 = DpllNode(str(neg_var) + ":= true", [create_dpll_tree(clause_list_copy, plr_allowed)])
+                case2 = DpllNode(str(neg_var) + ":= false", [create_dpll_tree(clause_list, plr_allowed)])
             else:
-                case1 = DpllNode(str(var) + ":= true", [create_dpll_tree(clause_list)])
-                case2 = DpllNode(str(var) + ":= false", [create_dpll_tree(clause_list_copy)])
+                case1 = DpllNode(str(var) + ":= true", [create_dpll_tree(clause_list, plr_allowed)])
+                case2 = DpllNode(str(var) + ":= false", [create_dpll_tree(clause_list_copy, plr_allowed)])
             return DpllNode(text, [case1, case2])
 
 

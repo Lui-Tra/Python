@@ -235,8 +235,8 @@ class Formula:
                     res.append({var, })
         return res
 
-    def dpll(self, scale=1):
-        root = create_dpll_tree(self.to_clause_list())
+    def dpll(self, scale=1, plr_allowed=True):
+        root = create_dpll_tree(self.to_clause_list(), plr_allowed)
         display_dpll_tree(root, scale)
 
     def __str__(self):
