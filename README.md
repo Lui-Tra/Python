@@ -40,3 +40,20 @@ Bunte Wahrheitstafeln können auch ausgegeben werden
 ```python
 formel.print_truth_table()
 ```
+
+### DPLL
+Der DPLL Algorithmus mit graphischer ausgabe erhält man mit:
+```python
+formel.dpll(scale=2)
+```
+
+### Resolventbildung
+Normale Resolventenbildung geht mittels:
+```python
+formel.resolvent(scale=2)
+```
+
+Linear Resolventenbildung geht mittels:
+```python
+formel.linear_resolvent(scale=2)
+```
