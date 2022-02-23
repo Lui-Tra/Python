@@ -67,26 +67,56 @@ class Resolvent:
             self.parent1.traverse(indent + 2)
             self.parent2.traverse(indent + 2)
 
-    def is_linear(self, clause_list):
-        # TODO fix
-        path = []
-        current = self
-        while current is not None:
-            path.append(current)
-            current = current.parent1
-
-        linear = True
-        for it in path:
-            if it.parent2 not in path and it.parent2 not in clause_list:
-                linear = False
-
-        return linear
-
     def __repr__(self):
         return str(self.clause)
 
 
-def get_resolvent_path(clause_list, linear=False):
+def get_pairs(parent1, parent2):
+    pairs = [it for it in parent1.clause if it not in parent2.clause] + \
+            [it for it in parent2.clause if it not in parent1.clause]
+    rem = []
+    for it in pairs:
+        inverse = NotOperator(it) if isinstance(it, Variable) else it.children[0]
+        if inverse not in pairs:
+            rem.append(it)
+    for it in rem:
+        pairs.remove(it)
+
+    return pairs
+
+
+def make_resolvent(parent1, parent2, pairs):
+    resolvent = [it for it in parent1.clause]
+    for it in parent2.clause:
+        if it not in resolvent:
+            resolvent.append(it)
+    for it in pairs:
+        resolvent.remove(it)
+    return Resolvent(resolvent, parent1, parent2, max(parent1.row, parent2.row) + 1)
+
+
+def get_linear_resolvent_path(clause_list, path=None, max_length=10):
+    if path is None:
+        clause_list = [Resolvent(it, None, None, 0) for it in clause_list]
+        for it in clause_list:
+            p = get_linear_resolvent_path(clause_list, [it], max_length)
+            if p is not None and len(p[-1].clause) == 0:
+                return p
+    else:
+        if len(path[-1].clause) == 0 or len(path) > max_length:
+            return path
+
+        last = path[-1]
+        for parent in clause_list + path:
+            if parent != last:
+                pairs = get_pairs(parent, last)
+                if len(pairs) == 2:
+                    p = get_linear_resolvent_path(clause_list, path + [make_resolvent(parent, last, pairs)], max_length)
+                    if p is not None and len(p[-1].clause) == 0:
+                        return p
+
+
+def get_resolvent_path(clause_list):
     contradiction = Resolvent([], None, None, -1)
 
     resolvents = [Resolvent(it, None, None, 0) for it in clause_list]
@@ -96,32 +126,12 @@ def get_resolvent_path(clause_list, linear=False):
         for parent1 in resolvents:
             for parent2 in resolvents:
                 if parent1 != parent2:
-                    pairs = [it for it in parent1.clause if it not in parent2.clause] + \
-                            [it for it in parent2.clause if it not in parent1.clause]
-                    rem = []
-                    for it in pairs:
-                        inverse = NotOperator(it) if isinstance(it, Variable) else it.children[0]
-                        if inverse not in pairs:
-                            rem.append(it)
-                    for it in rem:
-                        pairs.remove(it)
-
+                    pairs = get_pairs(parent1, parent2)
                     if len(pairs) == 2:
-                        resolvent = [it for it in parent1.clause]
-                        for it in parent2.clause:
-                            if it not in resolvent:
-                                resolvent.append(it)
-                        for it in pairs:
-                            resolvent.remove(it)
-                        new.append(Resolvent(resolvent, parent1, parent2, max(parent1.row, parent2.row) + 1))
+                        new.append(make_resolvent(parent1, parent2, pairs))
         resolvents.extend(new)
 
-    if linear:
-        for it in resolvents:
-            if len(it.clause) == 0 and it.is_linear(clause_list):
-                return it
-    else:
-        return resolvents[resolvents.index(contradiction)]
+    return resolvents[resolvents.index(contradiction)]
 
 
 def display_resolvent_path(root, scale=1):
@@ -133,7 +143,10 @@ def display_resolvent_path(root, scale=1):
     font = pygame.freetype.SysFont("Segoe UI", 15 * scale)
     root.render_texts(font)
 
-    row0 = root.get_all(0)
+    row0 = []
+    for it in root.get_all(0):
+        if it not in row0:
+            row0.append(it)
     w = v_spacer
     for it in row0:
         it.set_pos([w, h_spacer])
@@ -145,22 +158,22 @@ def display_resolvent_path(root, scale=1):
 
     screen = pygame.display.set_mode((w, h))
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
+    try:
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
 
-        screen.fill((255, 255, 255))
+            screen.fill((255, 255, 255))
 
-        root.display(screen)
+            root.display(screen)
 
-        pygame.display.update()
-        clock.tick(30)
+            pygame.display.update()
+            clock.tick(30)
+    except pygame.error:
+        print("Quit")
 
 
 if __name__ == '__main__':
-    form = parser.parse("{{A , C, U}, {A , C, ¬U}, {¬A , U}, {¬A , ¬U}, {¬C, U}, {¬C, ¬U}}")
-    cl = form.to_clause_list()
-    root = get_resolvent_path(cl)
-    display_resolvent_path(root, scale=4)
-
+    form = parser.parse("{{A , C, U}, {A , C, ¬U}, {¬A , U}, {¬A , ¬U}, {¬C, U}, {¬C, ¬U}}") # {{c, ¬e}, {b}, {¬c, ¬b, ¬e}, {a, b}, {e, ¬b}, {¬c, a}}
+    form.linear_resolvent(scale=2)

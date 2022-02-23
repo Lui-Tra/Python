@@ -1,5 +1,6 @@
 import KVGenerator
 from Operator import NotOperator, AndOperator, OrOperator
+from ResolventSolver import get_resolvent_path, display_resolvent_path, get_linear_resolvent_path
 from Variable import Variable
 from DPLLSolver import create_dpll_tree, display_dpll_tree
 from KVGenerator import generate_kv
@@ -238,6 +239,20 @@ class Formula:
     def dpll(self, scale=1, plr_allowed=True):
         root = create_dpll_tree(self.to_clause_list(), plr_allowed)
         display_dpll_tree(root, scale)
+
+    def resolvent(self, scale=1):
+        cl = self.to_clause_list()
+        root = get_resolvent_path(cl)
+        display_resolvent_path(root, scale=scale)
+
+    def linear_resolvent(self, scale=1):
+        path = None
+        cl = self.to_clause_list()
+        i = 2
+        while path is None:
+            path = get_linear_resolvent_path(cl, max_length=i)
+            i += 1
+        display_resolvent_path(path[-1], scale=scale)
 
     def __str__(self):
         return str(self.root)
